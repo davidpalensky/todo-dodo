@@ -1,3 +1,2 @@
 # todo-dodo
-This project exists to mess around with go, and potentially with htmx for creating an api endpoint.
-# todo-dodo
+This is a school project, aiming to help improve my web development skills.
