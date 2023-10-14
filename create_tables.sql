@@ -7,7 +7,9 @@ CREATE TABLE users (
 CREATE TABLE tags (
     tag_id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
-    color TEXT NOT NULL
+    color TEXT NOT NULL,
+    user_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
 CREATE TABLE tasks (
