@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,24 +10,18 @@ import (
 	"os/signal"
 	"time"
 
+	"todo-dodo/api"
+
 	"github.com/gorilla/mux"
-	_ "github.com/libsql/libsql-client-go/libsql"
 )
-
-// "libsql://[your-database].turso.io?authToken=[your-auth-token]"
-var DB_URL = os.Getenv("TODO_DODO_DB_URL")
-var DB_AUTH_TOKEN = os.Getenv("TODO_DODO_DB_TOKEN")
-
-// Gotta love global variables
-var DB, DB_ERR = sql.Open("libsql", DB_URL)
 
 func main() {
 	// Log messages
 	log.Println("Starting Server")
 
 	// Check DB connection
-	if DB_ERR != nil {
-		log.Printf("Failed to connect to db %s: %s", DB_URL, DB_ERR)
+	if api.DB_ERR != nil {
+		log.Printf("Failed to connect to db %s: %s", api.DB_URL, api.DB_ERR)
 		os.Exit(1)
 	}
 
@@ -76,7 +69,7 @@ func HomeHandler(writer http.ResponseWriter, request *http.Request) {
 
 func FetchTasks(writer http.ResponseWriter, request *http.Request) {
 	// TODO: Make user specific and add auth
-	db_result, err := DB.Query("SELECT * FROM tasks;")
+	db_result, err := api.DB.Query("SELECT * FROM tasks;")
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(writer, "Error: Could not fetch data from database")
