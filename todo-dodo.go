@@ -48,10 +48,10 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
-	r.HandleFunc("/api/v1/task/create", FetchTasks)
+	r.HandleFunc("/api/v1/task/fetch", FetchTasks)
 
 	http.Handle("/", r)
-	http.Handle("/api/v1/task/create", r)
+	http.Handle("/api/v1/task/fetch", r)
 
 	srv := &http.Server{
 		Handler: r,
