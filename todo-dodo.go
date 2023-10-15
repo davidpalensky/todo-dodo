@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,27 +10,48 @@ import (
 	"os/signal"
 
 	"github.com/gorilla/mux"
+	_ "github.com/libsql/libsql-client-go/libsql"
 )
+
+// "libsql://[your-database].turso.io?authToken=[your-auth-token]"
+var DB_URL = os.Getenv("TODO_DODO_DB_URL")
+var DB_AUTH_TOKEN = os.Getenv("TODO_DODO_DB_TOKEN")
+
+// Gotta love global variables
+var DB, DB_ERR = sql.Open("libsql", DB_URL)
 
 func HomeHandler(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusOK)
 	fmt.Fprintf(writer, "Message Recieved.\n")
 }
 
-func CreateTask(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusNotImplemented)
-	fmt.Fprintf(writer, "Creating tasks has not been implemented yet.")
+func FetchTasks(writer http.ResponseWriter, request *http.Request) {
+	db_result, err := DB.Query("SELECT * FROM tasks;")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(writer, "Error: Could not fetch data from database")
+		log.Printf("Failed to open db: %s", err)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	fmt.Fprintf(writer, "db_result: %v\n", db_result)
+	return
 }
 
 func main() {
 	log.Println("Starting Server.")
+	defer log.Println("Stoppped Server.")
+	if DB_ERR != nil {
+		log.Printf("Failed to open db %s: %s", DB_URL, DB_ERR)
+		os.Exit(1)
+	}
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
-	r.HandleFunc("/api/v1/create", CreateTask)
+	r.HandleFunc("/api/v1/task/create", FetchTasks)
 
 	http.Handle("/", r)
-	http.Handle("/api/v1/create", r)
+	http.Handle("/api/v1/task/create", r)
 
 	srv := &http.Server{
 		Handler: r,
