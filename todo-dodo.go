@@ -1,8 +1,8 @@
 package main
 
 import (
-	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -30,7 +30,7 @@ func FetchTasks(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(writer, "Error: Could not fetch data from database")
-		log.Printf("Failed to open db: %s", err)
+		log.Printf("Error: db error: %s", err)
 		return
 	}
 	writer.WriteHeader(http.StatusOK)
@@ -38,20 +38,38 @@ func FetchTasks(writer http.ResponseWriter, request *http.Request) {
 	return
 }
 
+// TODO: Implement user-authS
+type TaskCreationCommand struct {
+	title   string
+	content string
+	due     uint
+	user_id uint
+}
+
+func CreateTask(writer http.ResponseWriter, request *http.Request) {
+	var args TaskCreationCommand
+	err := json.NewDecoder(request.Body).Decode(&args)
+	if err != nil {
+		fmt.Fprintf(writer, "Error could not deserialize task creation arguements: %s", err.Error())
+		return
+	}
+
+}
+
 func main() {
+	// Log messages
 	log.Println("Starting Server.")
 	defer log.Println("Stoppped Server.")
+
+	// Check DB connection
 	if DB_ERR != nil {
-		log.Printf("Failed to open db %s: %s", DB_URL, DB_ERR)
+		log.Printf("Failed to connect to db %s: %s", DB_URL, DB_ERR)
 		os.Exit(1)
 	}
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
 	r.HandleFunc("/api/v1/task/fetch", FetchTasks)
-
-	http.Handle("/", r)
-	http.Handle("/api/v1/task/fetch", r)
 
 	srv := &http.Server{
 		Handler: r,
@@ -72,15 +90,5 @@ func main() {
 	// Block until we receive our signal.
 	<-c
 
-	// Create a deadline to wait for.
-	ctx, cancel := context.WithTimeout(context.Background(), 100)
-	defer cancel()
-	// Doesn't block if no connections, but will otherwise wait
-	// until the timeout deadline.
-	srv.Shutdown(ctx)
-	// Optionally, you could run srv.Shutdown in a goroutine and block on
-	// <-ctx.Done() if your application should wait for other services
-	// to finalize based on context cancellation.
-	log.Println("Stoppped Server.")
 	os.Exit(0)
 }
