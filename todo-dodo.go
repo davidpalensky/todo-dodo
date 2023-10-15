@@ -20,42 +20,6 @@ var DB_AUTH_TOKEN = os.Getenv("TODO_DODO_DB_TOKEN")
 // Gotta love global variables
 var DB, DB_ERR = sql.Open("libsql", DB_URL)
 
-func HomeHandler(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusOK)
-	fmt.Fprintf(writer, "Message Recieved.\n")
-}
-
-func FetchTasks(writer http.ResponseWriter, request *http.Request) {
-	db_result, err := DB.Query("SELECT * FROM tasks;")
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(writer, "Error: Could not fetch data from database")
-		log.Printf("Error: db error: %s", err)
-		return
-	}
-	writer.WriteHeader(http.StatusOK)
-	fmt.Fprintf(writer, "db_result: %v\n", db_result)
-	return
-}
-
-// TODO: Implement user-authS
-type TaskCreationCommand struct {
-	title   string
-	content string
-	due     uint
-	user_id uint
-}
-
-func CreateTask(writer http.ResponseWriter, request *http.Request) {
-	var args TaskCreationCommand
-	err := json.NewDecoder(request.Body).Decode(&args)
-	if err != nil {
-		fmt.Fprintf(writer, "Error could not deserialize task creation arguements: %s", err.Error())
-		return
-	}
-
-}
-
 func main() {
 	// Log messages
 	log.Println("Starting Server.")
@@ -91,4 +55,40 @@ func main() {
 	<-c
 
 	os.Exit(0)
+}
+
+func HomeHandler(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(http.StatusOK)
+	fmt.Fprintf(writer, "Message Recieved.\n")
+}
+
+func FetchTasks(writer http.ResponseWriter, request *http.Request) {
+	db_result, err := DB.Query("SELECT * FROM tasks;")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(writer, "Error: Could not fetch data from database")
+		log.Printf("Error: db error: %s", err)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	fmt.Fprintf(writer, "db_result: %v\n", db_result)
+	return
+}
+
+// TODO: Implement user-authS
+type TaskCreationCommand struct {
+	title   string
+	content string
+	due     uint
+	user_id uint
+}
+
+func CreateTask(writer http.ResponseWriter, request *http.Request) {
+	var args TaskCreationCommand
+	err := json.NewDecoder(request.Body).Decode(&args)
+	if err != nil {
+		fmt.Fprintf(writer, "Error could not deserialize task creation arguements: %s", err.Error())
+		return
+	}
+
 }
