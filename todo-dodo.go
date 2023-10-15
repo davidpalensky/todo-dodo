@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/gorilla/mux"
 	_ "github.com/libsql/libsql-client-go/libsql"
@@ -22,8 +24,7 @@ var DB, DB_ERR = sql.Open("libsql", DB_URL)
 
 func main() {
 	// Log messages
-	log.Println("Starting Server.")
-	defer log.Println("Stoppped Server.")
+	log.Println("Starting Server")
 
 	// Check DB connection
 	if DB_ERR != nil {
@@ -31,12 +32,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	r := mux.NewRouter()
-	r.HandleFunc("/", HomeHandler)
-	r.HandleFunc("/api/v1/task/fetch", FetchTasks)
+	router := mux.NewRouter()
+	router.HandleFunc("/", HomeHandler)
+	router.HandleFunc("/api/v1/task/fetch", FetchTasks)
 
 	srv := &http.Server{
-		Handler: r,
+		Handler: router,
 		Addr:    "127.0.0.1:8000",
 	}
 	// Run our server in a goroutine so that it doesn't block.
@@ -45,15 +46,26 @@ func main() {
 			log.Println(err)
 		}
 	}()
+	log.Println("Server Started")
 
-	c := make(chan os.Signal, 1)
+	quit := make(chan os.Signal, 1)
 	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
 	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
-	signal.Notify(c, os.Interrupt)
+	signal.Notify(quit, os.Interrupt)
 
 	// Block until we receive our signal.
-	<-c
+	<-quit
+	log.Println("Stoppping Server")
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		cancel()
+	}()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server Shutdown Failed:%+v", err)
+	}
+	log.Println("Server Stopped")
 	os.Exit(0)
 }
 
@@ -63,6 +75,7 @@ func HomeHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func FetchTasks(writer http.ResponseWriter, request *http.Request) {
+	// TODO: Make user specific and add auth
 	db_result, err := DB.Query("SELECT * FROM tasks;")
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -75,7 +88,7 @@ func FetchTasks(writer http.ResponseWriter, request *http.Request) {
 	return
 }
 
-// TODO: Implement user-authS
+// TODO: Implement user-auth
 type TaskCreationCommand struct {
 	title   string
 	content string
@@ -83,10 +96,12 @@ type TaskCreationCommand struct {
 	user_id uint
 }
 
+// TODO: Implement
 func CreateTask(writer http.ResponseWriter, request *http.Request) {
 	var args TaskCreationCommand
 	err := json.NewDecoder(request.Body).Decode(&args)
 	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(writer, "Error could not deserialize task creation arguements: %s", err.Error())
 		return
 	}
