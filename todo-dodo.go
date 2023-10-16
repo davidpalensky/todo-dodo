@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"todo-dodo/api2"
+	"todo-dodo/api"
 	"todo-dodo/db"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +17,8 @@ func main() {
 	// Setup router
 	engine := gin.Default()
 	engine.GET("/", HomeHandler)
-	engine.POST("/api/v2/task/create", api2.TaskCreateEnpoint)
+	engine.POST("/api/v2/task/create", api.TaskCreateEnpoint)
+	engine.POST("/api/v2/task/fetch", api.TaskFetchEnpoint)
 	engine.Run()
 }
 
