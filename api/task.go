@@ -6,9 +6,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"todo-dodo/db"
 )
 
-// TODO: Implement user-auth
+// The expected data from the client when creating tasks
 type CreateArgs struct {
 	Title    string
 	Content  string
@@ -33,7 +34,7 @@ func CreateTask(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	_, err2 := DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?);", args.Title, args.Content, args.Deadline, args.User_id)
+	_, err2 := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?);", args.Title, args.Content, args.Deadline, args.User_id)
 	if err2 != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(writer, "Error: Could not fetch data from database")
@@ -46,11 +47,13 @@ func CreateTask(writer http.ResponseWriter, request *http.Request) {
 	return
 }
 
+// The expected information from the client when fetching tasks
 type FetchArgs struct {
 	User_id uint64
 }
 
-type FetchReturn struct {
+// The data returned from the database when fetching tasks
+type FetchReturnDB struct {
 	Task_id   uint
 	User_id   uint
 	Title     string
@@ -79,8 +82,8 @@ func FetchTasks(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// Query DB
-	var result []FetchReturn
-	err2 := DB.Select(&result, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
+	var result []FetchReturnDB
+	err2 := db.DB.Select(&result, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
 	if err2 != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(writer, "Error: Could not fetch data from database")

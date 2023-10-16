@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"todo-dodo/api"
+	"todo-dodo/db"
 
 	"github.com/gorilla/mux"
 	_ "github.com/libsql/libsql-client-go/libsql"
@@ -19,8 +20,8 @@ func main() {
 	// Log messages
 	log.Println("Starting Server")
 
-	api.DBConnect()
-	defer api.DB.Close()
+	db.DBConnect()
+	defer db.DB.Close()
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", HomeHandler)
@@ -61,6 +62,6 @@ func main() {
 }
 
 func HomeHandler(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusOK)
-	fmt.Fprintf(writer, "Message Recieved.\n")
+	writer.WriteHeader(http.StatusNotImplemented)
+	fmt.Fprintf(writer, "Website not yet implemented.\n")
 }
