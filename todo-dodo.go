@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,21 +12,20 @@ import (
 	"todo-dodo/api"
 
 	"github.com/gorilla/mux"
+	_ "github.com/libsql/libsql-client-go/libsql"
 )
 
 func main() {
 	// Log messages
 	log.Println("Starting Server")
 
-	// Check DB connection
-	if api.DB_ERR != nil {
-		log.Printf("Failed to connect to db %s: %s", api.DB_URL, api.DB_ERR)
-		os.Exit(1)
-	}
+	api.DBConnect()
+	defer api.DB.Close()
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", HomeHandler)
-	router.HandleFunc("/api/v1/task/fetch", FetchTasks)
+	router.HandleFunc("/api/v1/task/fetch", api.FetchTasks)
+	router.HandleFunc("/api/v1/task/create", api.CreateTask)
 
 	srv := &http.Server{
 		Handler: router,
@@ -65,38 +63,4 @@ func main() {
 func HomeHandler(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusOK)
 	fmt.Fprintf(writer, "Message Recieved.\n")
-}
-
-func FetchTasks(writer http.ResponseWriter, request *http.Request) {
-	// TODO: Make user specific and add auth
-	db_result, err := api.DB.Query("SELECT * FROM tasks;")
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(writer, "Error: Could not fetch data from database")
-		log.Printf("Error: db error: %s", err)
-		return
-	}
-	writer.WriteHeader(http.StatusOK)
-	fmt.Fprintf(writer, "db_result: %v\n", db_result)
-	return
-}
-
-// TODO: Implement user-auth
-type TaskCreationCommand struct {
-	title   string
-	content string
-	due     uint
-	user_id uint
-}
-
-// TODO: Implement
-func CreateTask(writer http.ResponseWriter, request *http.Request) {
-	var args TaskCreationCommand
-	err := json.NewDecoder(request.Body).Decode(&args)
-	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(writer, "Error could not deserialize task creation arguements: %s", err.Error())
-		return
-	}
-
 }
