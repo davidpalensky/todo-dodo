@@ -18,12 +18,12 @@ func (err *TaskError) Error() string {
 
 // The expected data from the client when creating tasks
 type TaskCreateArgs struct {
-	Title   string
-	Content string
+	Title   string `json:"title"`
+	Content string `json:"content"`
 	// Unix timestamp
-	Deadline uint
+	Deadline uint `json:"deadline"`
 	// Most correspond to a user in the users table
-	User_id uint
+	User_id uint `json:"user_id"`
 }
 
 // Adds tasks to db
