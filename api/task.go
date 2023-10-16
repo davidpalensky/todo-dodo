@@ -55,6 +55,22 @@ func TaskCreate(writer http.ResponseWriter, request *http.Request) {
 	return
 }
 
+func TaskCreateImpl(args []TaskCreateArgs) error {
+	// Golang why dont you just allow ignoring both return values of a tuple
+	a, _ := db.DB.Exec("BEGIN TRANSACTION;")
+	DoNothing(a)
+	for _, row := range args {
+		_, err := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?);", row.Title, row.Content, row.Deadline, row.User_id)
+		if err != nil {
+			log.Printf("Error: Could not fetch data from db: %s", err)
+			return &TaskError{msg: "Could not fetch data from db"}
+		}
+	}
+	b, _ := db.DB.Exec("COMMIT;")
+	DoNothing(b)
+	return nil
+}
+
 // The expected information from the client when fetching tasks
 type TaskFetchArgs struct {
 	User_id uint64
@@ -104,25 +120,4 @@ func TaskFetch(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusOK)
 	fmt.Fprintf(writer, "db_result: %s\n", result_as_json)
 	return
-}
-
-func TaskCreateImpl(args []TaskCreateArgs) error {
-	// Golang why dont you just allow ignoring both return values of a tuple
-	a, _ := db.DB.Exec("BEGIN TRANSACTION;")
-	DoNothing(a)
-	for _, row := range args {
-		_, err := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?);", row.Title, row.Content, row.Deadline, row.User_id)
-		if err != nil {
-			log.Printf("Error: Could not fetch data from db: %s", err)
-			return &TaskError{msg: "Could not fetch data from db"}
-		}
-	}
-	b, _ := db.DB.Exec("COMMIT;")
-	DoNothing(b)
-	return nil
-}
-
-// Helper for telling the go compiler to calm down a little
-func DoNothing(a any) {
-
 }
