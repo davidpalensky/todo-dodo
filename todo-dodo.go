@@ -17,38 +17,45 @@ import (
 )
 
 func main() {
-	// Log messages
+	// Start server
 	log.Println("Starting Server")
 
+	// Connect to db
 	db.DBConnect()
 	defer db.DB.Close()
 
+	// Setup router
 	router := mux.NewRouter()
 	router.HandleFunc("/", HomeHandler)
-	router.HandleFunc("/api/v1/task/fetch", api.FetchTasks)
-	router.HandleFunc("/api/v1/task/create", api.CreateTask)
+	router.HandleFunc("/api/v1/task/fetch", api.TaskFetch)
+	router.HandleFunc("/api/v1/task/create", api.TaskCreate)
 
+	// Setup server details
 	srv := &http.Server{
 		Handler: router,
 		Addr:    "127.0.0.1:8000",
 	}
-	// Run our server in a goroutine so that it doesn't block.
+
+	// Run server
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
 	}()
+
 	log.Println("Server Started")
 
+	// Prepare to accept SIGINT (Ctrl+C) to kill server
 	quit := make(chan os.Signal, 1)
-	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
-	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
 	signal.Notify(quit, os.Interrupt)
 
 	// Block until we receive our signal.
 	<-quit
+
+	// Shut down server
 	log.Println("Stoppping Server")
 
+	// Don't understand this
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer func() {
 		cancel()

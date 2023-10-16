@@ -1,5 +1,7 @@
 package api
 
+// TOPLEVEL TODO: Make it so that users create/delete when they create tasks
+
 import (
 	"encoding/json"
 	"fmt"
@@ -10,17 +12,25 @@ import (
 )
 
 // The expected data from the client when creating tasks
-type CreateArgs struct {
+type TaskCreateArgs struct {
 	Title    string
 	Content  string
 	Deadline uint
 	User_id  uint
 }
 
+type TaskError struct {
+	msg string
+}
+
+func (err *TaskError) Error() string {
+	return err.msg
+}
+
 // API endpoint for adding a task to the database
-func CreateTask(writer http.ResponseWriter, request *http.Request) {
+func TaskCreate(writer http.ResponseWriter, request *http.Request) {
 	// Get user data and unmarshall
-	var args CreateArgs
+	var args []TaskCreateArgs
 	req, err := io.ReadAll(request.Body)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -34,11 +44,9 @@ func CreateTask(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	_, err2 := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?);", args.Title, args.Content, args.Deadline, args.User_id)
-	if err2 != nil {
+	if err := TaskCreateImpl(args); err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(writer, "Error: Could not fetch data from database")
-		log.Printf("Error: db error: %s", err2)
+		fmt.Fprintf(writer, "Error: could not create tasks: %s", err.Error())
 		return
 	}
 
@@ -48,12 +56,12 @@ func CreateTask(writer http.ResponseWriter, request *http.Request) {
 }
 
 // The expected information from the client when fetching tasks
-type FetchArgs struct {
+type TaskFetchArgs struct {
 	User_id uint64
 }
 
 // The data returned from the database when fetching tasks
-type FetchReturnDB struct {
+type TaskFetchReturnDB struct {
 	Task_id   uint
 	User_id   uint
 	Title     string
@@ -63,11 +71,11 @@ type FetchReturnDB struct {
 	Completed bool
 }
 
-// API endpoint for fetching tasks from the database]
+// API endpoint for fetching tasks from the database
 // TODO: Make user specific and add auth
-func FetchTasks(writer http.ResponseWriter, request *http.Request) {
+func TaskFetch(writer http.ResponseWriter, request *http.Request) {
 	// Get user data and unmarshall
-	var args FetchArgs
+	var args TaskFetchArgs
 	req, err := io.ReadAll(request.Body)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -82,7 +90,7 @@ func FetchTasks(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// Query DB
-	var result []FetchReturnDB
+	var result []TaskFetchReturnDB
 	err2 := db.DB.Select(&result, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
 	if err2 != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -96,4 +104,25 @@ func FetchTasks(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusOK)
 	fmt.Fprintf(writer, "db_result: %s\n", result_as_json)
 	return
+}
+
+func TaskCreateImpl(args []TaskCreateArgs) error {
+	// Golang why dont you just allow ignoring both return values of a tuple
+	a, _ := db.DB.Exec("BEGIN TRANSACTION;")
+	DoNothing(a)
+	for _, row := range args {
+		_, err := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?);", row.Title, row.Content, row.Deadline, row.User_id)
+		if err != nil {
+			log.Printf("Error: Could not fetch data from db: %s", err)
+			return &TaskError{msg: "Could not fetch data from db"}
+		}
+	}
+	b, _ := db.DB.Exec("COMMIT;")
+	DoNothing(b)
+	return nil
+}
+
+// Helper for telling the go compiler to calm down a little
+func DoNothing(a any) {
+
 }
