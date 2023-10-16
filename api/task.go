@@ -1,6 +1,6 @@
 package api
 
-// TOPLEVEL TODO: Make it so that users create/delete when they create tasks
+// TOPLEVEL TODO: Make it so that users can add tags when they create/delete tasks
 
 import (
 	"encoding/json"
@@ -13,10 +13,12 @@ import (
 
 // The expected data from the client when creating tasks
 type TaskCreateArgs struct {
-	Title    string
-	Content  string
+	Title   string
+	Content string
+	// Unix timestamp
 	Deadline uint
-	User_id  uint
+	// Most correspond to a user in the users table
+	User_id uint
 }
 
 type TaskError struct {
@@ -55,6 +57,7 @@ func TaskCreate(writer http.ResponseWriter, request *http.Request) {
 	return
 }
 
+// Adds task to db
 func TaskCreateImpl(args []TaskCreateArgs) error {
 	// Golang why dont you just allow ignoring both return values of a tuple
 	a, _ := db.DB.Exec("BEGIN TRANSACTION;")
