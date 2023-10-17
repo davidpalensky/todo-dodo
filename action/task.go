@@ -1,6 +1,7 @@
 package action
 
 import (
+	"fmt"
 	"log"
 	"todo-dodo/db"
 )
@@ -55,10 +56,13 @@ func TaskCreate(args []TaskCreateArgs) error {
 // Deletes a batch of tasks, including their task_tag_links entries
 func TaskDeleteBatch(task_ids []uint64) error {
 	for _, task_id := range task_ids {
+		_, err1 := db.DB.Exec("DELETE FROM task_tag_links WHERE task_id = ?;", task_id)
+		if err1 != nil {
+			return &ActionError{Kind: "database", Msg: "Unable to delete task with task_id " + fmt.Sprintf("%d", task_id)}
+		}
 		_, err := db.DB.Exec("DELETE FROM tasks WHERE task_id = ?;", task_id)
 		if err != nil {
-			db.DB.Exec("ROLLBACK;")
-			return &ActionError{Kind: "database", Msg: "Unable to delete task with task_id " + string(task_id)}
+			return &ActionError{Kind: "database", Msg: "Unable to delete task with task_id " + fmt.Sprintf("%d", task_id)}
 		}
 	}
 	return nil

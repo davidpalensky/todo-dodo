@@ -81,7 +81,7 @@ type TagFetchAllDBReturn struct {
 	Color   string `json:"color"`
 }
 
-// Create a tag
+// Fetch all tags
 func TagFetchAll(args *TagFetchAllArgs) ([]TagFetchAllDBReturn, error) {
 	var result []TagFetchAllDBReturn
 	err := db.DB.Select(&result, "SELECT * FROM tags WHERE user_id = ?;", fmt.Sprintf("%d", args.User_id))
