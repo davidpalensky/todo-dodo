@@ -1,0 +1,1 @@
+curl -vX POST http://localhost:8080/api/v2/task/create -d @add_task.json \ --header "Content-Type: application/json"

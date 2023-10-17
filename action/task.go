@@ -5,17 +5,6 @@ import (
 	"todo-dodo/db"
 )
 
-// This error just wraps a string
-type TaskError struct {
-	Kind string
-	// Developer friendly message
-	Msg string
-}
-
-func (err *TaskError) Error() string {
-	return "kind: " + err.Kind + ", msg:" + err.Msg
-}
-
 // The expected data from the client when creating tasks
 type TaskCreateArgs struct {
 	Title   string `json:"title"`
@@ -24,23 +13,54 @@ type TaskCreateArgs struct {
 	Deadline uint `json:"deadline"`
 	// Most correspond to a user in the users table
 	User_id uint `json:"user_id"`
+	// The associated tag data
+	Tags []TagModel `json:"tags"`
 }
 
 // Adds tasks to db
 // TODO: Cleanup
-func TaskCreateImpl(args []TaskCreateArgs) error {
+// FIXME: Make transactions work correctly
+func TaskCreate(args []TaskCreateArgs) error {
 	// Golang why dont you just allow ignoring both return values of a tuple
-	a, _ := db.DB.Exec("BEGIN TRANSACTION;")
-	DoNothing(a)
+	db.DB.Exec("BEGIN TRANSACTION;")
 	for _, row := range args {
-		_, err := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?);", row.Title, row.Content, row.Deadline, row.User_id)
+
+		// Insert task
+		res, err := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?) RETURNING task_id;", row.Title, row.Content, row.Deadline, row.User_id)
+		task_id, err1 := res.LastInsertId()
+		if err1 != nil {
+			db.DB.Exec("ROLLBACK;")
+			//log.Printf("Error: Could not insert data into db: %s", err)
+			log.Fatalf("This query should not fail 1: %s", err1.Error())
+		}
 		if err != nil {
-			log.Printf("Error: Could not insert data into db: %s", err)
-			return &TaskError{Kind: "internal", Msg: "Could not fetch data from db"}
+			db.DB.Exec("ROLLBACK;")
+			//log.Printf("Error: Could not insert data into db: %s", err)
+			return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tasks into db: " + err.Error()}
+		}
+
+		// Do tag stuff
+		task_id_uint64 := uint64(task_id)
+		err3 := TagCreateBatch(row.Tags, &task_id_uint64)
+		if err3 != nil {
+			db.DB.Exec("ROLLBACK;")
+			return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tags into db: " + err.Error()}
+		}
+
+	}
+	db.DB.Exec("COMMIT;")
+	return nil
+}
+
+// Deletes a batch of tasks, including their task_tag_links entries
+func TaskDeleteBatch(task_ids []uint64) error {
+	for _, task_id := range task_ids {
+		_, err := db.DB.Exec("DELETE FROM tasks WHERE task_id = ?;", task_id)
+		if err != nil {
+			db.DB.Exec("ROLLBACK;")
+			return &ActionError{Kind: "database", Msg: "Unable to delete task with task_id " + string(task_id)}
 		}
 	}
-	b, _ := db.DB.Exec("COMMIT;")
-	DoNothing(b)
 	return nil
 }
 
@@ -62,9 +82,9 @@ type TaskFetchDBReturn struct {
 	Completed bool   `json:"completed"`
 }
 
-// API endpoint for fetching tasks from the database
+// Fetches all tasks from db
 // TODO: Make user specific and add auth
-func TaskFetch(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
+func TaskFetchDB(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
 	// Query DB
 	var result []TaskFetchDBReturn
 	err := db.DB.Select(&result, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
@@ -74,3 +94,22 @@ func TaskFetch(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
 	}
 	return result, nil
 }
+
+type TaskFetchAllWithTagsReturn struct {
+	Task_data TaskFetchDBReturn `json:"task_data"`
+	Tags      []TagModel        `json:"tags"`
+}
+
+// Fetches all tasks from db aswell as the tags for each
+/*
+func TaskFetchAllWithTags(args *TaskFetchArgs) ([]TaskFetchAllWithTagsReturn, error) {
+	// Query DB
+	var result []TaskFetchAllWithTagsReturn
+	err := db.DB.Select(&result.Task_data, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+*/

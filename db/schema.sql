@@ -1,14 +1,15 @@
 CREATE TABLE users (
     user_id INTEGER PRIMARY KEY,
-    username TEXT NOT NULL
+    username TEXT NOT NULL,
+    UNIQUE(user_id, username)
 );
-
 
 CREATE TABLE tags (
     tag_id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     color TEXT NOT NULL,
     user_id INTEGER,
+    UNIQUE(user_id, title, color),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"todo-dodo/action"
 
@@ -18,10 +19,10 @@ func TaskCreateEnpoint(ctx *gin.Context) {
 		})
 		return
 	}
-	if err := action.TaskCreateImpl(*args); err != nil {
+	if err := action.TaskCreate(*args); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",
-			"message": "could not update record",
+			"message": "could not update record: " + err.Error(),
 		})
 		return
 	}
@@ -36,9 +37,10 @@ func TaskFetchEnpoint(ctx *gin.Context) {
 			"status":  "error",
 			"message": "invalid arguements or incorrectly encoded json provided",
 		})
+		log.Printf("Error: %s", err.Error())
 		return
 	}
-	result, err := action.TaskFetch(args)
+	result, err := action.TaskFetchDB(args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",
