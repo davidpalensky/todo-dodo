@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"todo-dodo/action"
+	"todo-dodo/orchestration"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Api endpoint for creating a batch of tasks for a user
 func TaskCreateBatchEnpoint(ctx *gin.Context) {
-	args := new([]action.TaskCreateArgs)
+	args := new([]orchestration.TaskCreateArgs)
 	if err := ctx.Bind(args); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"status":  "error",
@@ -19,7 +19,7 @@ func TaskCreateBatchEnpoint(ctx *gin.Context) {
 		})
 		return
 	}
-	if err := action.TaskCreateBatch(*args); err != nil {
+	if err := orchestration.TaskCreateBatch(*args); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",
 			"message": "could create tasks",
@@ -31,7 +31,7 @@ func TaskCreateBatchEnpoint(ctx *gin.Context) {
 
 // Api endpoint for fetching all tasks for a user
 func TaskFetchAllEnpoint(ctx *gin.Context) {
-	args := new(action.TaskFetchArgs)
+	args := new(orchestration.TaskFetchArgs)
 	if err := ctx.Bind(args); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"status":  "error",
@@ -40,7 +40,7 @@ func TaskFetchAllEnpoint(ctx *gin.Context) {
 		log.Printf("Error: %s", err.Error())
 		return
 	}
-	result, err := action.TaskFetchAllWithTags(args)
+	result, err := orchestration.TaskFetchAllWithTags(args)
 	if err != nil {
 		log.Printf("Epic debugging: %s", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -65,7 +65,7 @@ func TaskDeleteEnpoint(ctx *gin.Context) {
 		log.Printf("Error: %s", err.Error())
 		return
 	}
-	err := action.TaskDeleteBatch(*args)
+	err := orchestration.TaskDeleteBatch(*args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",

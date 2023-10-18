@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"todo-dodo/api"
 	"todo-dodo/db"
 
@@ -18,19 +17,14 @@ func main() {
 	engine := gin.Default()
 
 	// JSON-based APIs
-	engine.POST("/api/v2/task/create", api.TaskCreateBatchEnpoint)
-	engine.POST("/api/v2/task/fetch", api.TaskFetchAllEnpoint)
-	engine.POST("/api/v2/task/delete", api.TaskDeleteEnpoint)
+	engine.POST("/api/v1/task/create", api.TaskCreateBatchEnpoint)
+	engine.POST("/api/v1/task/fetch", api.TaskFetchAllEnpoint)
+	engine.POST("/api/v1/task/delete", api.TaskDeleteEnpoint)
 
-	engine.POST("/api/v2/tag/delete", api.TagDeleteBatchEnpoint)
+	engine.POST("/api/v1/tag/delete", api.TagDeleteBatchEnpoint)
+
+	engine.StaticFile("/", "./pages/unimplemented.html")
 
 	// Run server
 	engine.Run()
-}
-
-func HomeHandler(ctx *gin.Context) {
-	ctx.JSON(http.StatusNotImplemented, gin.H{
-		"status":  "not implemented",
-		"message": "the website has not been created yet",
-	})
 }

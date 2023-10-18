@@ -3,7 +3,7 @@ package api
 import (
 	"log"
 	"net/http"
-	"todo-dodo/action"
+	"todo-dodo/orchestration"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,7 @@ func TagDeleteBatchEnpoint(ctx *gin.Context) {
 		log.Printf("Error: %s", err.Error())
 		return
 	}
-	err := action.TaskDeleteBatch(*args)
+	err := orchestration.TaskDeleteBatch(*args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",
