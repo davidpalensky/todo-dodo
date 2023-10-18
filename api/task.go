@@ -10,7 +10,7 @@ import (
 )
 
 // Api endpoint for creating a batch of tasks for a user
-func TaskCreateEnpoint(ctx *gin.Context) {
+func TaskCreateBatchEnpoint(ctx *gin.Context) {
 	args := new([]action.TaskCreateArgs)
 	if err := ctx.Bind(args); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -19,10 +19,10 @@ func TaskCreateEnpoint(ctx *gin.Context) {
 		})
 		return
 	}
-	if err := action.TaskCreate(*args); err != nil {
+	if err := action.TaskCreateBatch(*args); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",
-			"message": "could not update record: " + err.Error(),
+			"message": "could create tasks",
 		})
 		return
 	}
@@ -30,7 +30,7 @@ func TaskCreateEnpoint(ctx *gin.Context) {
 }
 
 // Api endpoint for fetching all tasks for a user
-func TaskFetchEnpoint(ctx *gin.Context) {
+func TaskFetchAllEnpoint(ctx *gin.Context) {
 	args := new(action.TaskFetchArgs)
 	if err := ctx.Bind(args); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -40,15 +40,38 @@ func TaskFetchEnpoint(ctx *gin.Context) {
 		log.Printf("Error: %s", err.Error())
 		return
 	}
-	result, err := action.TaskFetchDB(args)
+	result, err := action.TaskFetchAllWithTags(args)
 	if err != nil {
+		log.Printf("Epic debugging: %s", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",
-			"message": "could not update record",
+			"message": "could not fetch tasks",
 		})
 		return
 	}
 	b, _ := json.Marshal(result)
 	ctx.JSON(http.StatusOK, string(b))
+	return
+}
+
+// Api endpoint for deleting tags by sending a list of ids [..., ..., ..., ...]
+func TaskDeleteEnpoint(ctx *gin.Context) {
+	args := new([]uint64) // List of task ids
+	if err := ctx.Bind(args); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status":  "error",
+			"message": "invalid arguements or incorrectly encoded json provided",
+		})
+		log.Printf("Error: %s", err.Error())
+		return
+	}
+	err := action.TaskDeleteBatch(*args)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": "could not delete tasks",
+		})
+		return
+	}
 	return
 }

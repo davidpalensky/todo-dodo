@@ -17,8 +17,12 @@ func main() {
 	// Setup router
 	engine := gin.Default()
 	engine.GET("/", HomeHandler)
-	engine.POST("/api/v2/task/create", api.TaskCreateEnpoint)
-	engine.POST("/api/v2/task/fetch", api.TaskFetchEnpoint)
+	engine.POST("/api/v2/task/create", api.TaskCreateBatchEnpoint)
+	engine.POST("/api/v2/task/fetch", api.TaskFetchAllEnpoint)
+	engine.POST("/api/v2/task/delete", api.TaskDeleteEnpoint)
+	engine.POST("api/v2/tag/delte", api.TagDeleteBatchEnpoint)
+
+	// Run server
 	engine.Run()
 }
 

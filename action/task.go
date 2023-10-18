@@ -15,29 +15,28 @@ type TaskCreateArgs struct {
 	// Most correspond to a user in the users table
 	User_id uint `json:"user_id"`
 	// The associated tag data
-	Tags []TagModel `json:"tags"`
+	Tags []TagFetcher `json:"tags"`
 }
 
 // Adds tasks to db
 // TODO: Cleanup
 // FIXME: Make transactions work correctly
-func TaskCreate(args []TaskCreateArgs) error {
-	// Golang why dont you just allow ignoring both return values of a tuple
+func TaskCreateBatch(args []TaskCreateArgs) error {
 	db.DB.Exec("BEGIN TRANSACTION;")
 	for _, row := range args {
 
 		// Insert task
-		res, err := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?) RETURNING task_id;", row.Title, row.Content, row.Deadline, row.User_id)
-		task_id, err1 := res.LastInsertId()
+		res, err1 := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?) RETURNING task_id;", row.Title, row.Content, row.Deadline, row.User_id)
+		task_id, err2 := res.LastInsertId()
 		if err1 != nil {
 			db.DB.Exec("ROLLBACK;")
 			//log.Printf("Error: Could not insert data into db: %s", err)
 			log.Fatalf("This query should not fail 1: %s", err1.Error())
 		}
-		if err != nil {
+		if err2 != nil {
 			db.DB.Exec("ROLLBACK;")
 			//log.Printf("Error: Could not insert data into db: %s", err)
-			return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tasks into db: " + err.Error()}
+			return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tasks into db: " + err2.Error()}
 		}
 
 		// Do tag stuff
@@ -45,11 +44,11 @@ func TaskCreate(args []TaskCreateArgs) error {
 		err3 := TagCreateBatch(row.Tags, &task_id_uint64)
 		if err3 != nil {
 			db.DB.Exec("ROLLBACK;")
-			return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tags into db: " + err.Error()}
+			return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tags into db: " + err3.Error()}
 		}
 
 	}
-	db.DB.Exec("COMMIT;")
+	db.DB.Exec("COMMIT TRANSACTION;")
 	return nil
 }
 
@@ -68,7 +67,7 @@ func TaskDeleteBatch(task_ids []uint64) error {
 	return nil
 }
 
-// ----
+///////////////////////////////////////////////////////////////////////////////
 
 // The expected information from the client when fetching tasks
 type TaskFetchArgs struct {
@@ -77,8 +76,8 @@ type TaskFetchArgs struct {
 
 // The data returned from the database when fetching tasks
 type TaskFetchDBReturn struct {
-	Task_id   uint   `json:"task_id"`
-	User_id   uint   `json:"user_id"`
+	Task_id   uint64 `json:"task_id"`
+	User_id   uint64 `json:"user_id"`
 	Title     string `json:"title"`
 	Content   string `json:"content"`
 	Creation  uint64 `json:"creation"`
@@ -88,8 +87,7 @@ type TaskFetchDBReturn struct {
 
 // Fetches all tasks from db
 // TODO: Make user specific and add auth
-func TaskFetchDB(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
-	// Query DB
+func TaskFetchAllDB(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
 	var result []TaskFetchDBReturn
 	err := db.DB.Select(&result, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
 
@@ -99,21 +97,33 @@ func TaskFetchDB(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
 	return result, nil
 }
 
-type TaskFetchAllWithTagsReturn struct {
+type TaskFetchAllWithTagsRet struct {
 	Task_data TaskFetchDBReturn `json:"task_data"`
 	Tags      []TagModel        `json:"tags"`
 }
 
-// Fetches all tasks from db aswell as the tags for each
-/*
-func TaskFetchAllWithTags(args *TaskFetchArgs) ([]TaskFetchAllWithTagsReturn, error) {
-	// Query DB
-	var result []TaskFetchAllWithTagsReturn
-	err := db.DB.Select(&result.Task_data, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
-
+// Fetch all tasks including their associated tags
+func TaskFetchAllWithTags(args *TaskFetchArgs) ([]TaskFetchAllWithTagsRet, error) {
+	var tasks []TaskFetchDBReturn
+	err := db.DB.Select(&tasks, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+
+	var tags [][]TagModel
+	for idx := 0; idx < len(tasks); idx++ {
+		var current []TagModel
+		err1 := db.DB.Select(&current, "SELECT * FROM tags WHERE tag_id IN (SELECT tag_id FROM task_tag_links WHERE task_id = ?);", tasks[idx].Task_id)
+		if err1 != nil {
+			return nil, err1
+		}
+		tags = append(tags, current)
+	}
+
+	var combined []TaskFetchAllWithTagsRet
+	for idx := 0; idx < len(tasks); idx++ {
+		combined = append(combined, TaskFetchAllWithTagsRet{Task_data: tasks[idx], Tags: tags[idx]})
+	}
+
+	return combined, nil
 }
-*/
