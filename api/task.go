@@ -26,7 +26,6 @@ func TaskCreateBatchEnpoint(ctx *gin.Context) {
 		})
 		return
 	}
-	return
 }
 
 // Api endpoint for fetching all tasks for a user
@@ -42,7 +41,7 @@ func TaskFetchAllEnpoint(ctx *gin.Context) {
 	}
 	result, err := orchestration.TaskFetchAllWithTags(args)
 	if err != nil {
-		log.Printf("Epic debugging: %s", err.Error())
+		//log.Printf("Epic debugging: %s", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",
 			"message": "could not fetch tasks",
@@ -51,7 +50,6 @@ func TaskFetchAllEnpoint(ctx *gin.Context) {
 	}
 	b, _ := json.Marshal(result)
 	ctx.JSON(http.StatusOK, string(b))
-	return
 }
 
 // Api endpoint for deleting tags by sending a list of ids [..., ..., ..., ...]
@@ -73,5 +71,4 @@ func TaskDeleteEnpoint(ctx *gin.Context) {
 		})
 		return
 	}
-	return
 }
