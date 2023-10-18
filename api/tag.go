@@ -27,5 +27,4 @@ func TagDeleteBatchEnpoint(ctx *gin.Context) {
 		})
 		return
 	}
-	return
 }
