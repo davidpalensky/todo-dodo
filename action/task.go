@@ -97,33 +97,44 @@ func TaskFetchAllDB(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
 	return result, nil
 }
 
+type TasksWithTags struct {
+	Task_Data TaskFetchDBReturn `json:"task_data"`
+	Tag_ids   []uint64          `json:"tag_ids"`
+}
+
 type TaskFetchAllWithTagsRet struct {
-	Task_data TaskFetchDBReturn `json:"task_data"`
-	Tags      []TagModel        `json:"tags"`
+	Tasks []TasksWithTags `json:"tasks"`
+	Tags  []TagModel      `json:"tags"`
 }
 
 // Fetch all tasks including their associated tags
-func TaskFetchAllWithTags(args *TaskFetchArgs) ([]TaskFetchAllWithTagsRet, error) {
+func TaskFetchAllWithTags(args *TaskFetchArgs) (*TaskFetchAllWithTagsRet, error) {
 	var tasks []TaskFetchDBReturn
 	err := db.DB.Select(&tasks, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
 	if err != nil {
 		return nil, err
 	}
 
-	var tags [][]TagModel
-	for idx := 0; idx < len(tasks); idx++ {
-		var current []TagModel
-		err1 := db.DB.Select(&current, "SELECT * FROM tags WHERE tag_id IN (SELECT tag_id FROM task_tag_links WHERE task_id = ?);", tasks[idx].Task_id)
-		if err1 != nil {
-			return nil, err1
+	var tag_ids [][]uint64
+	for _, task := range tasks {
+		var current_ids []uint64
+		err := db.DB.Select(&current_ids, "SELECT tag_id FROM task_tag_links WHERE task_id = ?;", task.Task_id)
+		if err != nil {
+			return nil, err
 		}
-		tags = append(tags, current)
+		tag_ids = append(tag_ids, current_ids)
 	}
 
-	var combined []TaskFetchAllWithTagsRet
-	for idx := 0; idx < len(tasks); idx++ {
-		combined = append(combined, TaskFetchAllWithTagsRet{Task_data: tasks[idx], Tags: tags[idx]})
+	var tasks_with_tags []TasksWithTags
+	for idx, task := range tasks {
+		tasks_with_tags = append(tasks_with_tags, TasksWithTags{Task_Data: task, Tag_ids: tag_ids[idx]})
 	}
 
-	return combined, nil
+	var tags []TagModel
+	err1 := db.DB.Select(&tags, "SELECT * FROM tags WHERE user_id = ?;", args.User_id)
+	if err1 != nil {
+		return nil, err1
+	}
+
+	return &TaskFetchAllWithTagsRet{Tasks: tasks_with_tags, Tags: tags}, nil
 }

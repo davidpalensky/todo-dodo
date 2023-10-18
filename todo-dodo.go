@@ -11,16 +11,18 @@ import (
 
 func main() {
 	// Init db
-	db.DBConnect()
+	db.Connect()
 	defer db.DB.Close()
 
 	// Setup router
 	engine := gin.Default()
-	engine.GET("/", HomeHandler)
+
+	// JSON-based APIs
 	engine.POST("/api/v2/task/create", api.TaskCreateBatchEnpoint)
 	engine.POST("/api/v2/task/fetch", api.TaskFetchAllEnpoint)
 	engine.POST("/api/v2/task/delete", api.TaskDeleteEnpoint)
-	engine.POST("api/v2/tag/delte", api.TagDeleteBatchEnpoint)
+
+	engine.POST("/api/v2/tag/delete", api.TagDeleteBatchEnpoint)
 
 	// Run server
 	engine.Run()

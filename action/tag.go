@@ -22,6 +22,7 @@ func TagCreateBatch(tags []TagFetcher, task_id_link *uint64) error {
 	return nil
 }
 
+// Yes this function is very messy and does too many queries, i am not a sqlite magician however.
 func tagCreateBatchLinked(tags []TagFetcher, task_id uint64) error {
 	for _, tag := range tags {
 		// Yes, this is awkward af

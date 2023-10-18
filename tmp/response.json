@@ -1,242 +1,223 @@
-[
-    {
-        "task_data": {
-            "task_id": 2,
-            "user_id": 1,
-            "title": "test123",
-            "content": "test123content",
-            "creation": 1697495551,
-            "deadline": 1697495551,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 3,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697546571,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 4,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697546585,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 5,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697546656,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 6,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697546705,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 7,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697546744,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 8,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697546760,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 9,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697546840,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 10,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697546951,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": null
-    },
-    {
-        "task_data": {
-            "task_id": 11,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697547011,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": [
-            {
-                "tag_id": 3,
+{
+    "tasks": [
+        {
+            "task_data": {
+                "task_id": 2,
                 "user_id": 1,
-                "title": "test",
-                "color": "#ffffff"
-            }
-        ]
-    },
-    {
-        "task_data": {
-            "task_id": 12,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697547341,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": [
-            {
-                "tag_id": 3,
-                "user_id": 1,
-                "title": "test",
-                "color": "#ffffff"
-            }
-        ]
-    },
-    {
-        "task_data": {
-            "task_id": 13,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697548225,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": [
-            {
-                "tag_id": 3,
-                "user_id": 1,
-                "title": "test",
-                "color": "#ffffff"
-            }
-        ]
-    },
-    {
-        "task_data": {
-            "task_id": 14,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697548336,
-            "deadline": 1697457757,
-            "completed": false
-        },
-        "tags": [
-            {
-                "tag_id": 3,
-                "user_id": 1,
-                "title": "test",
-                "color": "#ffffff"
+                "title": "test123",
+                "content": "test123content",
+                "creation": 1697495551,
+                "deadline": 1697495551,
+                "completed": false
             },
-            {
-                "tag_id": 5,
-                "user_id": 1,
-                "title": "test2",
-                "color": "#000000"
-            }
-        ]
-    },
-    {
-        "task_data": {
-            "task_id": 15,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697548340,
-            "deadline": 1697457757,
-            "completed": false
+            "tag_ids": null
         },
-        "tags": [
-            {
-                "tag_id": 3,
+        {
+            "task_data": {
+                "task_id": 3,
                 "user_id": 1,
-                "title": "test",
-                "color": "#ffffff"
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697546571,
+                "deadline": 1697457757,
+                "completed": false
             },
-            {
-                "tag_id": 5,
-                "user_id": 1,
-                "title": "test2",
-                "color": "#000000"
-            }
-        ]
-    },
-    {
-        "task_data": {
-            "task_id": 16,
-            "user_id": 1,
-            "title": "Enjoy life somewhat",
-            "content": "Try to be happy",
-            "creation": 1697548341,
-            "deadline": 1697457757,
-            "completed": false
+            "tag_ids": null
         },
-        "tags": [
-            {
-                "tag_id": 3,
+        {
+            "task_data": {
+                "task_id": 4,
                 "user_id": 1,
-                "title": "test",
-                "color": "#ffffff"
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697546585,
+                "deadline": 1697457757,
+                "completed": false
             },
-            {
-                "tag_id": 5,
+            "tag_ids": null
+        },
+        {
+            "task_data": {
+                "task_id": 5,
                 "user_id": 1,
-                "title": "test2",
-                "color": "#000000"
-            }
-        ]
-    }
-]
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697546656,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": null
+        },
+        {
+            "task_data": {
+                "task_id": 6,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697546705,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": null
+        },
+        {
+            "task_data": {
+                "task_id": 7,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697546744,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": null
+        },
+        {
+            "task_data": {
+                "task_id": 8,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697546760,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": null
+        },
+        {
+            "task_data": {
+                "task_id": 9,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697546840,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": null
+        },
+        {
+            "task_data": {
+                "task_id": 10,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697546951,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": null
+        },
+        {
+            "task_data": {
+                "task_id": 11,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697547011,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": [
+                3
+            ]
+        },
+        {
+            "task_data": {
+                "task_id": 12,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697547341,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": [
+                3
+            ]
+        },
+        {
+            "task_data": {
+                "task_id": 14,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697548336,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": [
+                3,
+                5
+            ]
+        },
+        {
+            "task_data": {
+                "task_id": 15,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697548340,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": [
+                3,
+                5
+            ]
+        },
+        {
+            "task_data": {
+                "task_id": 16,
+                "user_id": 1,
+                "title": "Enjoy life somewhat",
+                "content": "Try to be happy",
+                "creation": 1697548341,
+                "deadline": 1697457757,
+                "completed": false
+            },
+            "tag_ids": [
+                3,
+                5
+            ]
+        }
+    ],
+    "tags": [
+        {
+            "tag_id": 3,
+            "user_id": 1,
+            "title": "test",
+            "color": "#ffffff"
+        },
+        {
+            "tag_id": 4,
+            "user_id": 1,
+            "title": "test",
+            "color": "red"
+        },
+        {
+            "tag_id": 1,
+            "user_id": 1,
+            "title": "test-bullshit",
+            "color": "#ffffff"
+        },
+        {
+            "tag_id": 6,
+            "user_id": 1,
+            "title": "test12345",
+            "color": "blue af"
+        },
+        {
+            "tag_id": 5,
+            "user_id": 1,
+            "title": "test2",
+            "color": "#000000"
+        },
+        {
+            "tag_id": 2,
+            "user_id": 1,
+            "title": "white as fuck",
+            "color": "#ffffff"
+        }
+    ]
+}
