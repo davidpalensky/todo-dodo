@@ -6,7 +6,6 @@ import (
 	"todo-dodo/pages"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/libsql/libsql-client-go/libsql"
 )
 
 func main() {
