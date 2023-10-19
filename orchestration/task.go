@@ -97,7 +97,7 @@ func TaskFetchAllDB(args *TaskFetchArgs) ([]TaskModel, error) {
 }
 
 type TasksWithTagIds struct {
-	Task_Data TaskModel `json:"task_data"`
+	Task_data TaskModel `json:"task_data"`
 	Tag_ids   []uint64  `json:"tag_ids"`
 }
 
@@ -126,7 +126,7 @@ func TaskFetchAllWithTags(args *TaskFetchArgs) (*TasksWithTags, error) {
 
 	var tasks_with_tags []TasksWithTagIds
 	for idx, task := range tasks {
-		tasks_with_tags = append(tasks_with_tags, TasksWithTagIds{Task_Data: task, Tag_ids: tag_ids[idx]})
+		tasks_with_tags = append(tasks_with_tags, TasksWithTagIds{Task_data: task, Tag_ids: tag_ids[idx]})
 	}
 
 	var tags []TagModel

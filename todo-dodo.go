@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"todo-dodo/api"
 	"todo-dodo/db"
 	"todo-dodo/pages"
@@ -27,6 +28,10 @@ func main() {
 	engine.LoadHTMLGlob("./pages/*")
 
 	engine.GET("/", pages.Index)
+
+	if os.Getenv("TODO_DODO_DEV") == "1" {
+		engine.GET("/test.html")
+	}
 
 	// Run server
 	engine.Run()

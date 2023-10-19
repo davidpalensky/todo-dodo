@@ -11,7 +11,7 @@
       A todo app that will hopefully soon exists.
       Its lifetime depends on the generousity of AWS Free Tier.
 
-      Some serious <a href="/app/test.html">testing</a> going on out here.
+      Some serious <a href="test.html">testing</a> going on out here.
     </p>
     <h3>
       Tasks
@@ -19,13 +19,15 @@
     <table>
       <tr>
           <th>Title</th>
-          <th>Description</th>
+          <th>Creation</th>
+          <th>Deadline</th>
           <th>Completed</th>
       </tr>
       {{ range .Tasks}}
           <tr>
               <td>{{ .Title }}</td>
-              <td>{{ .Content }}</td>
+              <td>{{ .Creation }}</td>
+              <td>{{ .Deadline }}</td>
               <td>{{ .Completed }}</td>
           </tr>
       {{ end }}
