@@ -75,7 +75,7 @@ type TaskFetchArgs struct {
 }
 
 // The data returned from the database when fetching tasks
-type TaskFetchDBReturn struct {
+type TaskModel struct {
 	Task_id   uint64 `json:"task_id"`
 	User_id   uint64 `json:"user_id"`
 	Title     string `json:"title"`
@@ -87,8 +87,8 @@ type TaskFetchDBReturn struct {
 
 // Fetches all tasks from db
 // TODO: Make user specific and add auth
-func TaskFetchAllDB(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
-	var result []TaskFetchDBReturn
+func TaskFetchAllDB(args *TaskFetchArgs) ([]TaskModel, error) {
+	var result []TaskModel
 	err := db.DB.Select(&result, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
 
 	if err != nil {
@@ -97,19 +97,19 @@ func TaskFetchAllDB(args *TaskFetchArgs) ([]TaskFetchDBReturn, error) {
 	return result, nil
 }
 
-type TasksWithTags struct {
-	Task_Data TaskFetchDBReturn `json:"task_data"`
-	Tag_ids   []uint64          `json:"tag_ids"`
+type TasksWithTagIds struct {
+	Task_Data TaskModel `json:"task_data"`
+	Tag_ids   []uint64  `json:"tag_ids"`
 }
 
-type TaskFetchAllWithTagsRet struct {
-	Tasks []TasksWithTags `json:"tasks"`
-	Tags  []TagModel      `json:"tags"`
+type TasksWithTags struct {
+	Tasks []TasksWithTagIds `json:"tasks"`
+	Tags  []TagModel        `json:"tags"`
 }
 
 // Fetch all tasks including their associated tags
-func TaskFetchAllWithTags(args *TaskFetchArgs) (*TaskFetchAllWithTagsRet, error) {
-	var tasks []TaskFetchDBReturn
+func TaskFetchAllWithTags(args *TaskFetchArgs) (*TasksWithTags, error) {
+	var tasks []TaskModel
 	err := db.DB.Select(&tasks, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)
 	if err != nil {
 		return nil, err
@@ -125,9 +125,9 @@ func TaskFetchAllWithTags(args *TaskFetchArgs) (*TaskFetchAllWithTagsRet, error)
 		tag_ids = append(tag_ids, current_ids)
 	}
 
-	var tasks_with_tags []TasksWithTags
+	var tasks_with_tags []TasksWithTagIds
 	for idx, task := range tasks {
-		tasks_with_tags = append(tasks_with_tags, TasksWithTags{Task_Data: task, Tag_ids: tag_ids[idx]})
+		tasks_with_tags = append(tasks_with_tags, TasksWithTagIds{Task_Data: task, Tag_ids: tag_ids[idx]})
 	}
 
 	var tags []TagModel
@@ -136,5 +136,5 @@ func TaskFetchAllWithTags(args *TaskFetchArgs) (*TaskFetchAllWithTagsRet, error)
 		return nil, err1
 	}
 
-	return &TaskFetchAllWithTagsRet{Tasks: tasks_with_tags, Tags: tags}, nil
+	return &TasksWithTags{Tasks: tasks_with_tags, Tags: tags}, nil
 }

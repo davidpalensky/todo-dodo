@@ -23,6 +23,7 @@ func main() {
 
 	engine.POST("/api/v1/tag/delete", api.TagDeleteBatchEnpoint)
 
+	// Web Pages
 	engine.StaticFile("/", "./pages/unimplemented.html")
 
 	// Run server
