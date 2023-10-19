@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"todo-dodo/db"
+	"todo-dodo/util"
 )
 
 // Inserts a bunch of tags into the database, inserts into task_tag_links aswell, if task_id_link is not nil
@@ -25,6 +26,11 @@ func TagCreateBatch(tags []TagFetcher, task_id_link *uint64) error {
 // Yes this function is very messy and does too many queries, i am not a sqlite magician however.
 func tagCreateBatchLinked(tags []TagFetcher, task_id uint64) error {
 	for _, tag := range tags {
+		// Verify color
+		if !util.VerifyHexcode(tag.Color) {
+			return &ActionError{Kind: "invalid data", Msg: "Color code `" + tag.Color + "` is not a valid hex color code."}
+		}
+
 		// Yes, this is awkward af
 		var tag_id_retriever []uint64
 		err := db.DB.Select(&tag_id_retriever, "SELECT tag_id FROM tags WHERE user_id = ? AND title = ? AND color = ?;", tag.User_id, tag.Title, tag.Color)

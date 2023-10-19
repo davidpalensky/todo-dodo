@@ -2,7 +2,6 @@ package orchestration
 
 import (
 	"fmt"
-	"log"
 	"todo-dodo/db"
 )
 
@@ -30,8 +29,8 @@ func TaskCreateBatch(args []TaskCreateArgs) error {
 		task_id, err2 := res.LastInsertId()
 		if err1 != nil {
 			db.DB.Exec("ROLLBACK;")
-			//log.Printf("Error: Could not insert data into db: %s", err)
-			log.Fatalf("This query should not fail 1: %s", err1.Error())
+			//log.Printf("Error: Could not insert data into db: %s", err1.Error())
+			return &ActionError{Kind: "databse", Msg: "Error: Could not insert data into db: " + err1.Error()}
 		}
 		if err2 != nil {
 			db.DB.Exec("ROLLBACK;")
