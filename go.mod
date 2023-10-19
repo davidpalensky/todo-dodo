@@ -20,6 +20,7 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/libsql/sqlite-antlr4-parser v0.0.0-20230802215326-5cb5bb604475 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect

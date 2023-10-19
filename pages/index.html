@@ -13,5 +13,23 @@
 
       Some serious <a href="/app/test.html">testing</a> going on out here.
     </p>
+    <h3>
+      Tasks
+    </h3>
+    <table>
+      <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Completed</th>
+      </tr>
+      {{ range .Tasks}}
+          <tr>
+              <td>{{ .Title }}</td>
+              <td>{{ .Content }}</td>
+              <td>{{ .Completed }}</td>
+          </tr>
+      {{ end }}
+    </table>
+
   </body>
 </html>

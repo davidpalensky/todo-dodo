@@ -3,6 +3,7 @@ package main
 import (
 	"todo-dodo/api"
 	"todo-dodo/db"
+	"todo-dodo/pages"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/libsql/libsql-client-go/libsql"
@@ -10,8 +11,8 @@ import (
 
 func main() {
 	// Init db
-	db.Connect()
-	defer db.DB.Close()
+	db.Open()
+	defer db.Close()
 
 	// Setup router
 	engine := gin.Default()
@@ -24,7 +25,9 @@ func main() {
 	engine.POST("/api/v1/tag/delete", api.TagDeleteBatchEnpoint)
 
 	// Web Pages
-	engine.StaticFile("/", "./pages/unimplemented.html")
+	engine.LoadHTMLGlob("./pages/*")
+
+	engine.GET("/", pages.Index)
 
 	// Run server
 	engine.Run()
