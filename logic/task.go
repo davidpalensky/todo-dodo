@@ -39,6 +39,7 @@ func TaskCreateBatch(args []TaskCreateArgs) error {
 			//log.Printf("Error: Could not insert data into db: %s", err)
 			return err2
 		}
+		tx.Commit()
 
 		// Do tag stuff
 		task_id_uint64 := uint64(task_id)
@@ -49,7 +50,7 @@ func TaskCreateBatch(args []TaskCreateArgs) error {
 		}
 
 	}
-	tx.Commit()
+
 	return nil
 }
 

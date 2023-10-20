@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 	"todo-dodo/logic"
 
@@ -17,7 +18,7 @@ func TaskCreateBatchEnpoint(ctx *gin.Context) {
 		return
 	}
 	if err := logic.TaskCreateBatch(*args); err != nil {
-		//log.Printf("err: %s", err.Error())
+		log.Printf("err: %s", err.Error())
 		ctx.JSON(http.StatusInternalServerError,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to create tasks: Failed to modify database record."})
 		return
