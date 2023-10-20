@@ -6,7 +6,7 @@ import (
 )
 
 // The expected data from the client when creating tasks
-type TaskCreator struct {
+type TaskCreateArgs struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 	// Unix timestamp
@@ -18,7 +18,7 @@ type TaskCreator struct {
 }
 
 // Adds tasks to db
-func TaskCreateBatch(args []TaskCreator) error {
+func TaskCreateBatch(args []TaskCreateArgs) error {
 	tx, err := db.DB.Beginx()
 	if err != nil {
 		return err

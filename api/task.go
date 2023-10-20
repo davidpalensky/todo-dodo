@@ -9,7 +9,7 @@ import (
 
 // Api endpoint for creating a batch of tasks for a user
 func TaskCreateBatchEnpoint(ctx *gin.Context) {
-	args := new([]logic.TaskCreator)
+	args := new([]logic.TaskCreateArgs)
 	if err := ctx.Bind(args); err != nil {
 		//response, _ := json.Marshal(APIResponse{Success: false, Data: nil, Err_msg: "Unable to create tasks: Invalid JSON, or incorrect fields provided."})
 		ctx.JSON(http.StatusBadRequest,
