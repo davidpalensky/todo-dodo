@@ -12,7 +12,7 @@ type TaskCreator struct {
 	// Unix timestamp
 	Deadline uint `json:"deadline"`
 	// Most correspond to a user in the users table
-	UserId uint `json:"user_id"`
+	User_id uint `json:"user_id"`
 	// The associated tag data
 	Tags []TagCreator `json:"tags"`
 }
@@ -27,7 +27,7 @@ func TaskCreateBatch(args []TaskCreator) error {
 	for _, row := range args {
 
 		// Insert task
-		res, err1 := tx.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?) RETURNING task_id;", row.Title, row.Content, row.Deadline, row.UserId)
+		res, err1 := tx.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?) RETURNING task_id;", row.Title, row.Content, row.Deadline, row.User_id)
 		task_id, err2 := res.LastInsertId()
 		if err1 != nil {
 			tx.Rollback()
@@ -84,8 +84,8 @@ type TaskFetchArgs struct {
 
 // The data returned from the database when fetching tasks
 type TaskModel struct {
-	TaskId    uint64 `json:"task_id"`
-	UserId    uint64 `json:"user_id"`
+	Task_id   uint64 `json:"task_id"`
+	User_id   uint64 `json:"user_id"`
 	Title     string `json:"title"`
 	Content   string `json:"content"`
 	Creation  uint64 `json:"creation"`
@@ -106,8 +106,8 @@ func TaskFetchAllDB(args *TaskFetchArgs) ([]TaskModel, error) {
 }
 
 type TasksWithTagIds struct {
-	TaskData TaskModel `json:"task_data"`
-	TagIds   []uint64  `json:"tag_ids"`
+	Task_data TaskModel `json:"task_data"`
+	Tag_ids   []uint64  `json:"tag_ids"`
 }
 
 type TasksWithTags struct {
@@ -126,7 +126,7 @@ func TaskFetchAllWithTags(args *TaskFetchArgs) (*TasksWithTags, error) {
 	var tag_ids [][]uint64
 	for _, task := range tasks {
 		var current_ids []uint64
-		err := db.DB.Select(&current_ids, "SELECT tag_id FROM task_tag_links WHERE task_id = ?;", task.TaskId)
+		err := db.DB.Select(&current_ids, "SELECT tag_id FROM task_tag_links WHERE task_id = ?;", task.Task_id)
 		if err != nil {
 			return nil, err
 		}
@@ -135,7 +135,7 @@ func TaskFetchAllWithTags(args *TaskFetchArgs) (*TasksWithTags, error) {
 
 	var tasks_with_tags []TasksWithTagIds
 	for idx, task := range tasks {
-		tasks_with_tags = append(tasks_with_tags, TasksWithTagIds{TaskData: task, TagIds: tag_ids[idx]})
+		tasks_with_tags = append(tasks_with_tags, TasksWithTagIds{Task_data: task, Tag_ids: tag_ids[idx]})
 	}
 
 	var tags []TagModel
@@ -148,16 +148,16 @@ func TaskFetchAllWithTags(args *TaskFetchArgs) (*TasksWithTags, error) {
 }
 
 type TaskUpdatArgs struct {
-	TaskId     uint64   `json:"task_id"`
+	Task_id    uint64   `json:"task_id"`
 	Completion *bool    `json:"completion"`
 	Deadline   *uint64  `json:"deadline"`
-	TagIds     []uint64 `json:"tag_ids"`
+	Tag_ids    []uint64 `json:"tag_ids"`
 }
 
 // Updates/replaces a task to the given information. Does not change values provided as nil / an empty list is given.
 // If tags is not an empty list, all the current tags will be removed and replaced with the newly provided ones.
 func TaskUpdate(a TaskUpdatArgs) error {
-	if a.Completion == nil && a.Deadline == nil && len(a.TagIds) == 0 {
+	if a.Completion == nil && a.Deadline == nil && len(a.Tag_ids) == 0 {
 		return nil
 	}
 	tx, err := db.DB.Beginx()
@@ -171,28 +171,28 @@ func TaskUpdate(a TaskUpdatArgs) error {
 		} else {
 			completion = 0
 		}
-		_, err := tx.Exec("UPDATE OR IGNORE tasks SET completion = ? WHERE task_id = ?;", completion, a.TaskId)
+		_, err := tx.Exec("UPDATE OR IGNORE tasks SET completion = ? WHERE task_id = ?;", completion, a.Task_id)
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
 	if a.Deadline != nil {
-		_, err := tx.Exec("UPDATE OR IGNORE tasks SET deadline = ? WHERE task_id = ?;", a.Deadline, a.TaskId)
+		_, err := tx.Exec("UPDATE OR IGNORE tasks SET deadline = ? WHERE task_id = ?;", a.Deadline, a.Task_id)
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
-	if len(a.TagIds) != 0 {
+	if len(a.Tag_ids) != 0 {
 		type TaskTagLinksInserts struct {
 			TaskId uint64
 			TagId  uint64
 		}
 
 		var inserts []TaskTagLinksInserts
-		for _, tag_id := range a.TagIds {
-			inserts = append(inserts, TaskTagLinksInserts{TaskId: a.TaskId, TagId: tag_id})
+		for _, tag_id := range a.Tag_ids {
+			inserts = append(inserts, TaskTagLinksInserts{TaskId: a.Task_id, TagId: tag_id})
 		}
 
 		_, err = tx.NamedExec("INSERT INTO task_tag_links (task_id, tag_id) VALUES (:task_id, :tag_id)", inserts)

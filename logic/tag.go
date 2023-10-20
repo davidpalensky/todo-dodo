@@ -17,7 +17,7 @@ func TagCreateBatch(tags []TagCreator, task_id_link *uint64) error {
 		return err
 	}
 	for _, tag := range tags {
-		_, err := tx.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?) ON CONFLICT (user_id, title, color) DO NOTHING;", tag.UserId, tag.Title, tag.Color)
+		_, err := tx.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?) ON CONFLICT (user_id, title, color) DO NOTHING;", tag.User_id, tag.Title, tag.Color)
 		if err != nil {
 			//db.DB.Exec("ROLLBACK;")
 			//log.Printf("Error: Could not insert data into db: %s", err)
@@ -44,14 +44,14 @@ func tagCreateBatchLinked(tags []TagCreator, task_id uint64) error {
 
 		// Yes, this is awkward af
 		var tag_id_retriever []uint64
-		err := tx.Select(&tag_id_retriever, "SELECT tag_id FROM tags WHERE user_id = ? AND title = ? AND color = ?;", tag.UserId, tag.Title, tag.Color)
+		err := tx.Select(&tag_id_retriever, "SELECT tag_id FROM tags WHERE user_id = ? AND title = ? AND color = ?;", tag.User_id, tag.Title, tag.Color)
 		if err != nil {
 			//log.Printf("Error: Could not insert data into db: %s", err)
 			log.Fatalf("This query should not fail: %s", err.Error())
 		}
 		// If tag is not in there, add that shit
 		if len(tag_id_retriever) == 0 {
-			res, err := tx.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?);", tag.UserId, tag.Title, tag.Color)
+			res, err := tx.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?);", tag.User_id, tag.Title, tag.Color)
 			tag_id_int64, _ := res.LastInsertId()
 			tag_id := uint64(tag_id_int64)
 			if err != nil {
@@ -82,36 +82,28 @@ func tagCreateBatchLinked(tags []TagCreator, task_id uint64) error {
 
 // Required data for creating a tag
 type TagCreator struct {
-	UserId uint64 `json:"user_id"`
-	Title  string `json:"title"`
-	Color  string `json:"color"`
+	User_id uint64 `json:"user_id"`
+	Title   string `json:"title"`
+	Color   string `json:"color"`
 }
 
-// Required data for creating a tag
+// Model of the tag data in the DB
 type TagModel struct {
-	TagId  uint64 `json:"tag_id"`
-	UserId uint64 `json:"user_id"`
-	Title  string `json:"title"`
-	Color  string `json:"color"`
+	Tag_id  uint64 `json:"tag_id"`
+	User_id uint64 `json:"user_id"`
+	Title   string `json:"title"`
+	Color   string `json:"color"`
 }
 
 // Required data for creating a tag
 type TagFetchAllArgs struct {
-	UserId uint64 `json:"user_id"`
-}
-
-// Model of the tag data in the DB
-type TagFetchAllDBReturn struct {
-	TagId  uint64 `json:"tag_id"`
-	UserId uint64 `json:"user_id"`
-	Title  string `json:"title"`
-	Color  string `json:"color"`
+	User_id uint64 `json:"user_id"`
 }
 
 // Fetch all tags
-func TagFetchAll(a *TagFetchAllArgs) ([]TagFetchAllDBReturn, error) {
-	var result []TagFetchAllDBReturn
-	err := db.DB.Select(&result, "SELECT * FROM tags WHERE user_id = ?;", fmt.Sprintf("%d", a.UserId))
+func TagFetchAll(a *TagFetchAllArgs) ([]TagModel, error) {
+	var result []TagModel
+	err := db.DB.Select(&result, "SELECT * FROM tags WHERE user_id = ?;", fmt.Sprintf("%d", a.User_id))
 	if err != nil {
 		return nil, err
 	}
