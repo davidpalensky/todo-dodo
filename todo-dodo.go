@@ -21,6 +21,7 @@ func main() {
 	engine.POST("/api/v1/task/create", api.TaskCreateBatchEnpoint)
 	engine.POST("/api/v1/task/fetch", api.TaskFetchAllEnpoint)
 	engine.POST("/api/v1/task/delete", api.TaskDeleteBatchEnpoint)
+	engine.POST("/api/v1/task/update", api.TaskUpdateEndpoint)
 
 	engine.POST("/api/v1/tag/delete", api.TagDeleteBatchEnpoint)
 
@@ -34,7 +35,7 @@ func main() {
 	}
 
 	// Js files for client side behaviour
-	engine.StaticFile("/pages/index.js", "./pages/index.js")
+	engine.StaticFile("index.js", "./pages/index.js")
 
 	// Run server
 	engine.Run()

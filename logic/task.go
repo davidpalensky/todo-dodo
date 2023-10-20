@@ -2,6 +2,7 @@ package logic
 
 import (
 	"fmt"
+	"log"
 	"todo-dodo/db"
 )
 
@@ -159,6 +160,7 @@ func TaskUpdate(a TaskUpdatArgs) error {
 	if a.Completed == nil && a.Deadline == nil && len(a.Tag_ids) == 0 {
 		return nil
 	}
+	//log.Printf("TaskUpdate: Args = %v\n", a)
 	tx, err := db.DB.Beginx()
 	if err != nil {
 		return err
@@ -170,14 +172,15 @@ func TaskUpdate(a TaskUpdatArgs) error {
 		} else {
 			completed = 0
 		}
-		_, err := tx.Exec("UPDATE OR IGNORE tasks SET completed = ? WHERE task_id = ?;", completed, a.Task_id)
+		_, err := tx.Exec("UPDATE tasks SET completed = ? WHERE task_id = ?;", completed, a.Task_id)
 		if err != nil {
+			log.Printf("Err: %s", err.Error())
 			tx.Rollback()
 			return err
 		}
 	}
 	if a.Deadline != nil {
-		_, err := tx.Exec("UPDATE OR IGNORE tasks SET deadline = ? WHERE task_id = ?;", a.Deadline, a.Task_id)
+		_, err := tx.Exec("UPDATE tasks SET deadline = ? WHERE task_id = ?;", a.Deadline, a.Task_id)
 		if err != nil {
 			tx.Rollback()
 			return err

@@ -73,6 +73,7 @@ func TaskUpdateEndpoint(ctx *gin.Context) {
 		log.Printf("Error: %s", err.Error())
 		return
 	}
+	//log.Printf("TaskUpdateEndpoint: Args = %+v\n", args)
 	err := logic.TaskUpdate(*args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError,

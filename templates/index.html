@@ -3,7 +3,7 @@
   <head>
     <title>Go To-Do list</title>
     <!-- Vanilla JS for the win. -->
-    <script type="text/javascript" src="/pages/index.js"></script>
+    <script type="text/javascript" src="index.js"></script>
   </head>
 
   <body>
@@ -30,10 +30,11 @@
       {{ range .Tasks}}
       <tr id="task-{{ .Task_id}}" name="task-{{ .Task_id}}">
         <td>
-          <input id="task-{{ .Task_id }}-completion"
+          <input id="task-{{ .Task_id }}-completed"
             type="checkbox"
-            name="task-{{ .Task_id }}-completion"
-            onchange="taskToggleCompletion(this)">
+            name="task-{{ .Task_id }}-completed"
+            onchange="taskToggleCompleted(this)"
+            {{ if .Completed }} checked {{ end }}>
         </td>
       <td id="task-{{ .Task_id }}-title">
           {{ .Title }}
