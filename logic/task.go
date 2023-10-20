@@ -1,4 +1,4 @@
-package orchestration
+package logic
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 )
 
 // The expected data from the client when creating tasks
-type TaskCreateArgs struct {
+type TaskCreator struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 	// Unix timestamp
@@ -14,13 +14,13 @@ type TaskCreateArgs struct {
 	// Most correspond to a user in the users table
 	User_id uint `json:"user_id"`
 	// The associated tag data
-	Tags []TagFetcher `json:"tags"`
+	Tags []TagCreator `json:"tags"`
 }
 
 // Adds tasks to db
 // TODO: Cleanup
 // FIXME: Make transactions work correctly
-func TaskCreateBatch(args []TaskCreateArgs) error {
+func TaskCreateBatch(args []TaskCreator) error {
 	db.DB.Exec("BEGIN TRANSACTION;")
 	for _, row := range args {
 
@@ -30,12 +30,12 @@ func TaskCreateBatch(args []TaskCreateArgs) error {
 		if err1 != nil {
 			db.DB.Exec("ROLLBACK;")
 			//log.Printf("Error: Could not insert data into db: %s", err1.Error())
-			return &ActionError{Kind: "databse", Msg: "Error: Could not insert data into db: " + err1.Error()}
+			return err1
 		}
 		if err2 != nil {
 			db.DB.Exec("ROLLBACK;")
 			//log.Printf("Error: Could not insert data into db: %s", err)
-			return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tasks into db: " + err2.Error()}
+			return err2
 		}
 
 		// Do tag stuff
@@ -43,7 +43,7 @@ func TaskCreateBatch(args []TaskCreateArgs) error {
 		err3 := TagCreateBatch(row.Tags, &task_id_uint64)
 		if err3 != nil {
 			db.DB.Exec("ROLLBACK;")
-			return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tags into db: " + err3.Error()}
+			return err3
 		}
 
 	}

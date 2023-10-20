@@ -1,4 +1,4 @@
-package orchestration
+package logic
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 // Inserts a bunch of tags into the database, inserts into task_tag_links aswell, if task_id_link is not nil
-func TagCreateBatch(tags []TagFetcher, task_id_link *uint64) error {
+func TagCreateBatch(tags []TagCreator, task_id_link *uint64) error {
 	if task_id_link != nil {
 		return tagCreateBatchLinked(tags, *task_id_link)
 	}
@@ -24,7 +24,7 @@ func TagCreateBatch(tags []TagFetcher, task_id_link *uint64) error {
 }
 
 // Yes this function is very messy and does too many queries, i am not a sqlite magician however.
-func tagCreateBatchLinked(tags []TagFetcher, task_id uint64) error {
+func tagCreateBatchLinked(tags []TagCreator, task_id uint64) error {
 	for _, tag := range tags {
 		// Verify color
 		if !util.ValidateHexcode(tag.Color) {
@@ -45,20 +45,20 @@ func tagCreateBatchLinked(tags []TagFetcher, task_id uint64) error {
 			tag_id := uint64(tag_id_int64)
 			if err != nil {
 				//log.Printf("Error: Could not insert data into db: %s", err)
-				return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter tags into db: " + err.Error()}
+				return err
 			}
 			// Insert link
 			_, err1 := db.DB.Exec("INSERT INTO task_tag_links (task_id, tag_id) VALUES (?, ?);", task_id, tag_id)
 			if err1 != nil {
-				log.Printf("Error: Could not insert data into db: task_id = %d, tag_id = %d", task_id, tag_id)
-				return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter task tag links into db: " + err1.Error()}
+				//log.Printf("Error: Could not insert data into db: task_id = %d, tag_id = %d", task_id, tag_id)
+				return err1
 			}
 		} else { // Insert link
 			tag_id := tag_id_retriever[0]
 			_, err := db.DB.Exec("INSERT INTO task_tag_links (task_id, tag_id) VALUES (?, ?);", task_id, tag_id)
 			if err != nil {
-				log.Printf("Error: Could not insert data into db: task_id = %d, tag_id = %d", task_id, tag_id)
-				return &ActionError{Kind: "database", Msg: "TaskCreate: Could not enter task tag links into db: " + err.Error()}
+				//log.Printf("Error: Could not insert data into db: task_id = %d, tag_id = %d", task_id, tag_id)
+				return err
 			}
 		}
 	}
@@ -66,7 +66,7 @@ func tagCreateBatchLinked(tags []TagFetcher, task_id uint64) error {
 }
 
 // Required data for creating a tag
-type TagFetcher struct {
+type TagCreator struct {
 	User_id uint64 `json:"user_id"`
 	Title   string `json:"title"`
 	Color   string `json:"color"`

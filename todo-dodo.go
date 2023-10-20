@@ -20,7 +20,7 @@ func main() {
 	// JSON-based APIs
 	engine.POST("/api/v1/task/create", api.TaskCreateBatchEnpoint)
 	engine.POST("/api/v1/task/fetch", api.TaskFetchAllEnpoint)
-	engine.POST("/api/v1/task/delete", api.TaskDeleteEnpoint)
+	engine.POST("/api/v1/task/delete", api.TaskDeleteBatchEnpoint)
 
 	engine.POST("/api/v1/tag/delete", api.TagDeleteBatchEnpoint)
 

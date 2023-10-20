@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"todo-dodo/orchestration"
+	"todo-dodo/logic"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +22,7 @@ type TaskView struct {
 
 // Generate index file and fill in the data
 func Index(ctx *gin.Context) {
-	data, err := orchestration.TaskFetchAllWithTags(&orchestration.TaskFetchArgs{User_id: 1})
+	data, err := logic.TaskFetchAllWithTags(&logic.TaskFetchArgs{User_id: 1})
 	if err != nil {
 		ctx.HTML(http.StatusInternalServerError, "error.html", nil)
 		//log.Println("Could not render html: ", err.Error())

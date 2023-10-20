@@ -1,4 +1,4 @@
-package orchestration
+package logic
 
 // This error just wraps a string
 type ActionError struct {

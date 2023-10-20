@@ -1,74 +1,70 @@
 package api
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
-	"todo-dodo/orchestration"
+	"todo-dodo/logic"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Api endpoint for creating a batch of tasks for a user
 func TaskCreateBatchEnpoint(ctx *gin.Context) {
-	args := new([]orchestration.TaskCreateArgs)
+	args := new([]logic.TaskCreator)
 	if err := ctx.Bind(args); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "invalid arguements or incorrectly encoded json provided",
-		})
+		//response, _ := json.Marshal(APIResponse{Success: false, Data: nil, Err_msg: "Unable to create tasks: Invalid JSON, or incorrect fields provided."})
+		ctx.JSON(http.StatusBadRequest,
+			APIResponse{Success: false, Data: nil, Err_msg: "Unable to create tasks: Invalid JSON, or incorrect fields provided."})
 		return
 	}
-	if err := orchestration.TaskCreateBatch(*args); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "could create tasks",
-		})
+	if err := logic.TaskCreateBatch(*args); err != nil {
+		//log.Printf("err: %s", err.Error())
+		ctx.JSON(http.StatusInternalServerError,
+			APIResponse{Success: false, Data: nil, Err_msg: "Unable to create tasks: Failed to modify database record."})
 		return
 	}
+	ctx.JSON(http.StatusOK, APIResponse{Success: true, Data: nil, Err_msg: ""})
 }
 
 // Api endpoint for fetching all tasks for a user
 func TaskFetchAllEnpoint(ctx *gin.Context) {
-	args := new(orchestration.TaskFetchArgs)
+	args := new(logic.TaskFetchArgs)
 	if err := ctx.Bind(args); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "invalid arguements or incorrectly encoded json provided",
-		})
-		log.Printf("Error: %s", err.Error())
+		ctx.JSON(http.StatusBadRequest,
+			APIResponse{Success: false, Data: nil, Err_msg: "Unable to fetch tasks: Invalid JSON, or incorrect fields provided."})
+		//log.Printf("Error: %s", err.Error())
 		return
 	}
-	result, err := orchestration.TaskFetchAllWithTags(args)
+	result, err := logic.TaskFetchAllWithTags(args)
 	if err != nil {
 		//log.Printf("Epic debugging: %s", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "could not fetch tasks",
-		})
+		ctx.JSON(http.StatusInternalServerError,
+			APIResponse{Success: false, Data: nil, Err_msg: "Unable to create fetch tasks: Failed to read from database."})
 		return
 	}
-	b, _ := json.Marshal(result)
-	ctx.JSON(http.StatusOK, string(b))
+	ctx.JSON(http.StatusOK,
+		APIResponse{Success: true, Data: result, Err_msg: ""})
 }
 
 // Api endpoint for deleting tags by sending a list of ids [..., ..., ..., ...]
-func TaskDeleteEnpoint(ctx *gin.Context) {
+func TaskDeleteBatchEnpoint(ctx *gin.Context) {
 	args := new([]uint64) // List of task ids
 	if err := ctx.Bind(args); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "invalid arguements or incorrectly encoded json provided",
-		})
-		log.Printf("Error: %s", err.Error())
+		ctx.JSON(http.StatusBadRequest,
+			APIResponse{Success: false, Data: nil, Err_msg: "Unable to delete tasks: Invalid JSON, or incorrect fields provided."})
+		//log.Printf("Error: %s", err.Error())
 		return
 	}
-	err := orchestration.TaskDeleteBatch(*args)
+	err := logic.TaskDeleteBatch(*args)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "could not delete tasks",
-		})
+		ctx.JSON(http.StatusInternalServerError,
+			APIResponse{Success: false, Data: nil, Err_msg: "Unable to create delete tasks: Failed to access database."})
 		return
 	}
+	ctx.JSON(http.StatusOK, APIResponse{Success: true, Data: nil, Err_msg: ""})
 }
+
+// The endpoint for when a user clicks a checkbox on the frontend.
+//func TaskToggleCompletionEndpoint(ctx *gin.Context) {
+//	content, _ := io.ReadAll(ctx.Request.Body)
+//	log.Printf("Content: %s\n", content)
+//}
