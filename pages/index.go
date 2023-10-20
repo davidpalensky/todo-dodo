@@ -32,11 +32,11 @@ func Index(ctx *gin.Context) {
 	var task_view []TaskView
 	for i := 0; i < len(data.Tasks); i++ {
 		task_view = append(task_view, TaskView{
-			Title:     data.Tasks[i].Task_data.Title,
-			Creation:  time.Unix(int64(data.Tasks[i].Task_data.Creation), 0).Format("2 Jan 2006"),
-			Deadline:  time.Unix(int64(data.Tasks[i].Task_data.Deadline), 0).Format("2 Jan 2006"),
-			Completed: bool(data.Tasks[i].Task_data.Completed),
-			Task_id:   data.Tasks[i].Task_data.Task_id,
+			Title:     data.Tasks[i].TaskData.Title,
+			Creation:  time.Unix(int64(data.Tasks[i].TaskData.Creation), 0).Format("2 Jan 2006"),
+			Deadline:  time.Unix(int64(data.Tasks[i].TaskData.Deadline), 0).Format("2 Jan 2006"),
+			Completed: bool(data.Tasks[i].TaskData.Completed),
+			Task_id:   data.Tasks[i].TaskData.TaskId,
 		})
 	}
 	//log.Println("view: ", task_view)

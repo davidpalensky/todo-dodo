@@ -5,5 +5,5 @@ type APIResponse struct {
 	Success bool        `json:"success"`
 	Data    interface{} `json:"data"`
 	// Should be empty if success = 1
-	Err_msg string `json:"err_msg"`
+	ErrMsg string `json:"err_msg"`
 }

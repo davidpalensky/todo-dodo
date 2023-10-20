@@ -12,15 +12,15 @@ func TagDeleteBatchEnpoint(ctx *gin.Context) {
 	args := new([]uint64) // List of task ids
 	if err := ctx.Bind(args); err != nil {
 		ctx.JSON(http.StatusBadRequest,
-			APIResponse{Success: false, Data: nil, Err_msg: "Unable to delete tags: Invalid JSON, or incorrect fields provided."})
+			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to delete tags: Invalid JSON, or incorrect fields provided."})
 		//log.Printf("Error: %s", err.Error())
 		return
 	}
 	err := logic.TaskDeleteBatch(*args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError,
-			APIResponse{Success: false, Data: nil, Err_msg: "Unable to create fetch tasks: Failed to write to database."})
+			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to create fetch tasks: Failed to write to database."})
 		return
 	}
-	ctx.JSON(http.StatusOK, APIResponse{Success: true, Data: nil, Err_msg: ""})
+	ctx.JSON(http.StatusOK, APIResponse{Success: true, Data: nil, ErrMsg: ""})
 }
