@@ -18,7 +18,7 @@ func TaskCreateBatchEnpoint(ctx *gin.Context) {
 		return
 	}
 	if err := logic.TaskCreateBatch(*args); err != nil {
-		log.Printf("err: %s", err.Error())
+		//log.Printf("err: %s", err.Error())
 		ctx.JSON(http.StatusInternalServerError,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to create tasks: Failed to modify database record."})
 		return
@@ -64,8 +64,21 @@ func TaskDeleteBatchEnpoint(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, APIResponse{Success: true, Data: nil, ErrMsg: ""})
 }
 
-// The endpoint for when a user clicks a checkbox on the frontend.
-//func TaskToggleCompletionEndpoint(ctx *gin.Context) {
-//	content, _ := io.ReadAll(ctx.Request.Body)
-//	log.Printf("Content: %s\n", content)
-//}
+// Enpoint for updating tasks
+func TaskUpdateEndpoint(ctx *gin.Context) {
+	args := new(logic.TaskUpdatArgs) // List of task ids
+	if err := ctx.Bind(args); err != nil {
+		ctx.JSON(http.StatusBadRequest,
+			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to update task: Invalid JSON, or incorrect fields provided."})
+		log.Printf("Error: %s", err.Error())
+		return
+	}
+	err := logic.TaskUpdate(*args)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError,
+			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to create update: Failed to access database."})
+		log.Printf("Error: %s", err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, APIResponse{Success: true, Data: nil, ErrMsg: ""})
+}
