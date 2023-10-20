@@ -147,30 +147,30 @@ func TaskFetchAllWithTags(args *TaskFetchArgs) (*TasksWithTags, error) {
 }
 
 type TaskUpdatArgs struct {
-	Task_id    uint64   `json:"task_id"`
-	Completion *bool    `json:"completion"`
-	Deadline   *uint64  `json:"deadline"`
-	Tag_ids    []uint64 `json:"tag_ids"`
+	Task_id   uint64   `json:"task_id"`
+	Completed *bool    `json:"completed"`
+	Deadline  *uint64  `json:"deadline"`
+	Tag_ids   []uint64 `json:"tag_ids"`
 }
 
 // Updates/replaces a task to the given information. Does not change values provided as nil / an empty list is given.
 // If tags is not an empty list, all the current tags will be removed and replaced with the newly provided ones.
 func TaskUpdate(a TaskUpdatArgs) error {
-	if a.Completion == nil && a.Deadline == nil && len(a.Tag_ids) == 0 {
+	if a.Completed == nil && a.Deadline == nil && len(a.Tag_ids) == 0 {
 		return nil
 	}
 	tx, err := db.DB.Beginx()
 	if err != nil {
 		return err
 	}
-	if a.Completion != nil {
-		var completion int
-		if *a.Completion { // *a.Completion == true
-			completion = 1
+	if a.Completed != nil {
+		var completed int
+		if *a.Completed { // *a.Completed == true
+			completed = 1
 		} else {
-			completion = 0
+			completed = 0
 		}
-		_, err := tx.Exec("UPDATE OR IGNORE tasks SET completion = ? WHERE task_id = ?;", completion, a.Task_id)
+		_, err := tx.Exec("UPDATE OR IGNORE tasks SET completed = ? WHERE task_id = ?;", completed, a.Task_id)
 		if err != nil {
 			tx.Rollback()
 			return err
