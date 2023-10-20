@@ -75,8 +75,6 @@ func TaskDeleteBatch(task_ids []uint64) error {
 	return nil
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 // The expected information from the client when fetching tasks
 type TaskFetchArgs struct {
 	User_id uint64 `json:"user_id"`
