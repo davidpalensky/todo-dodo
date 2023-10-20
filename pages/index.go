@@ -17,6 +17,7 @@ type TaskView struct {
 	Creation  string
 	Deadline  string
 	Completed bool
+	Task_id   uint64
 }
 
 // Generate index file and fill in the data
@@ -32,9 +33,10 @@ func Index(ctx *gin.Context) {
 	for i := 0; i < len(data.Tasks); i++ {
 		task_view = append(task_view, TaskView{
 			Title:     data.Tasks[i].Task_data.Title,
-			Creation:  time.Unix(int64(data.Tasks[i].Task_data.Creation), 0).Format("2 January, 2006"),
-			Deadline:  time.Unix(int64(data.Tasks[i].Task_data.Deadline), 0).Format("2 January, 2006"),
+			Creation:  time.Unix(int64(data.Tasks[i].Task_data.Creation), 0).Format("2 Jan 2006"),
+			Deadline:  time.Unix(int64(data.Tasks[i].Task_data.Deadline), 0).Format("2 Jan 2006"),
 			Completed: bool(data.Tasks[i].Task_data.Completed),
+			Task_id:   data.Tasks[i].Task_data.Task_id,
 		})
 	}
 	//log.Println("view: ", task_view)

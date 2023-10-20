@@ -27,7 +27,7 @@ func TagCreateBatch(tags []TagFetcher, task_id_link *uint64) error {
 func tagCreateBatchLinked(tags []TagFetcher, task_id uint64) error {
 	for _, tag := range tags {
 		// Verify color
-		if !util.VerifyHexcode(tag.Color) {
+		if !util.ValidateHexcode(tag.Color) {
 			return &ActionError{Kind: "invalid data", Msg: "Color code `" + tag.Color + "` is not a valid hex color code."}
 		}
 
@@ -82,7 +82,7 @@ type TagModel struct {
 
 // Required data for creating a tag
 type TagFetchAllArgs struct {
-	User_id uint `json:"user_id"`
+	User_id uint64 `json:"user_id"`
 }
 
 // Model of the tag data in the DB

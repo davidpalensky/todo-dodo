@@ -25,13 +25,16 @@ func main() {
 	engine.POST("/api/v1/tag/delete", api.TagDeleteBatchEnpoint)
 
 	// Web Pages
-	engine.LoadHTMLGlob("./pages/*")
+	engine.LoadHTMLGlob("./templates/*")
 
 	engine.GET("/", pages.Index)
 
 	if os.Getenv("TODO_DODO_DEV") == "1" {
-		engine.GET("/test.html")
+		engine.GET("/test.html", pages.Test)
 	}
+
+	// Js files for client side behaviour
+	engine.StaticFile("/pages/index.js", "./pages/index.js")
 
 	// Run server
 	engine.Run()
