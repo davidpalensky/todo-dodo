@@ -12,58 +12,71 @@ func TagCreateBatch(tags []TagCreator, task_id_link *uint64) error {
 	if task_id_link != nil {
 		return tagCreateBatchLinked(tags, *task_id_link)
 	}
+	tx, err := db.DB.Beginx()
+	if err != nil {
+		return err
+	}
 	for _, tag := range tags {
-		_, err := db.DB.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?) ON CONFLICT (user_id, title, color) DO NOTHING;", tag.UserId, tag.Title, tag.Color)
+		_, err := tx.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?) ON CONFLICT (user_id, title, color) DO NOTHING;", tag.UserId, tag.Title, tag.Color)
 		if err != nil {
 			//db.DB.Exec("ROLLBACK;")
 			//log.Printf("Error: Could not insert data into db: %s", err)
+			tx.Rollback()
 			return &LogicError{Kind: "database", Msg: "TaskCreate: Could not enter tags into db: " + err.Error()}
 		}
 	}
+	tx.Commit()
 	return nil
 }
 
 // Yes this function is very messy and does too many queries, i am not a sqlite magician however.
-// TODO: Move more things into fewer queries if possible
-// Use 'prepared' sql statements.
 func tagCreateBatchLinked(tags []TagCreator, task_id uint64) error {
+	tx, err := db.DB.Beginx()
+	if err != nil {
+		return err
+	}
 	for _, tag := range tags {
 		// Verify color
 		if !util.ValidateHexcode(tag.Color) {
+			tx.Rollback()
 			return &LogicError{Kind: "invalid data", Msg: "Color code `" + tag.Color + "` is not a valid hex color code."}
 		}
 
 		// Yes, this is awkward af
 		var tag_id_retriever []uint64
-		err := db.DB.Select(&tag_id_retriever, "SELECT tag_id FROM tags WHERE user_id = ? AND title = ? AND color = ?;", tag.UserId, tag.Title, tag.Color)
+		err := tx.Select(&tag_id_retriever, "SELECT tag_id FROM tags WHERE user_id = ? AND title = ? AND color = ?;", tag.UserId, tag.Title, tag.Color)
 		if err != nil {
 			//log.Printf("Error: Could not insert data into db: %s", err)
 			log.Fatalf("This query should not fail: %s", err.Error())
 		}
 		// If tag is not in there, add that shit
 		if len(tag_id_retriever) == 0 {
-			res, err := db.DB.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?);", tag.UserId, tag.Title, tag.Color)
+			res, err := tx.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?);", tag.UserId, tag.Title, tag.Color)
 			tag_id_int64, _ := res.LastInsertId()
 			tag_id := uint64(tag_id_int64)
 			if err != nil {
 				//log.Printf("Error: Could not insert data into db: %s", err)
+				tx.Rollback()
 				return err
 			}
 			// Insert link
-			_, err1 := db.DB.Exec("INSERT INTO task_tag_links (task_id, tag_id) VALUES (?, ?);", task_id, tag_id)
+			_, err1 := tx.Exec("INSERT INTO task_tag_links (task_id, tag_id) VALUES (?, ?);", task_id, tag_id)
 			if err1 != nil {
 				//log.Printf("Error: Could not insert data into db: task_id = %d, tag_id = %d", task_id, tag_id)
+				tx.Rollback()
 				return err1
 			}
 		} else { // Insert link
 			tag_id := tag_id_retriever[0]
-			_, err := db.DB.Exec("INSERT INTO task_tag_links (task_id, tag_id) VALUES (?, ?);", task_id, tag_id)
+			_, err := tx.Exec("INSERT INTO task_tag_links (task_id, tag_id) VALUES (?, ?);", task_id, tag_id)
 			if err != nil {
 				//log.Printf("Error: Could not insert data into db: task_id = %d, tag_id = %d", task_id, tag_id)
+				tx.Rollback()
 				return err
 			}
 		}
 	}
+	tx.Commit()
 	return nil
 }
 
@@ -107,15 +120,20 @@ func TagFetchAll(a *TagFetchAllArgs) ([]TagFetchAllDBReturn, error) {
 
 // Delete a batch of tags
 func TagDeleteBatch(tag_ids []uint64) error {
+	tx, err := db.DB.Beginx()
+	if err != nil {
+		return err
+	}
 	for _, tag_id := range tag_ids {
-		_, err1 := db.DB.Exec("DELETE FROM task_tag_links WHERE tag_id = ?;", tag_id)
+		_, err1 := tx.Exec("DELETE FROM task_tag_links WHERE tag_id = ?;", tag_id)
 		if err1 != nil {
 			return &LogicError{Kind: "database", Msg: "Unable to delete tag with task_id " + fmt.Sprintf("%d", tag_id)}
 		}
-		_, err := db.DB.Exec("DELETE FROM tags WHERE tag_id = ?;", tag_id)
+		_, err := tx.Exec("DELETE FROM tags WHERE tag_id = ?;", tag_id)
 		if err != nil {
 			return &LogicError{Kind: "database", Msg: "Unable to delete tag with task_id " + fmt.Sprintf("%d", tag_id)}
 		}
 	}
+	tx.Commit()
 	return nil
 }

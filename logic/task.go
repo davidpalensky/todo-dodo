@@ -18,22 +18,24 @@ type TaskCreator struct {
 }
 
 // Adds tasks to db
-// TODO: Cleanup
-// FIXME: Make transactions work correctly
 func TaskCreateBatch(args []TaskCreator) error {
-	db.DB.Exec("BEGIN TRANSACTION;")
+	tx, err := db.DB.Beginx()
+	if err != nil {
+		return err
+	}
+	// OPTIMASATION: Use tx.NamedExec() to put all values into a single query.
 	for _, row := range args {
 
 		// Insert task
-		res, err1 := db.DB.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?) RETURNING task_id;", row.Title, row.Content, row.Deadline, row.UserId)
+		res, err1 := tx.Exec("INSERT INTO tasks (title, content, deadline, user_id) VALUES (?, ?, ?, ?) RETURNING task_id;", row.Title, row.Content, row.Deadline, row.UserId)
 		task_id, err2 := res.LastInsertId()
 		if err1 != nil {
-			db.DB.Exec("ROLLBACK;")
+			tx.Rollback()
 			//log.Printf("Error: Could not insert data into db: %s", err1.Error())
 			return err1
 		}
 		if err2 != nil {
-			db.DB.Exec("ROLLBACK;")
+			tx.Rollback()
 			//log.Printf("Error: Could not insert data into db: %s", err)
 			return err2
 		}
@@ -42,27 +44,34 @@ func TaskCreateBatch(args []TaskCreator) error {
 		task_id_uint64 := uint64(task_id)
 		err3 := TagCreateBatch(row.Tags, &task_id_uint64)
 		if err3 != nil {
-			db.DB.Exec("ROLLBACK;")
+			tx.Rollback()
 			return err3
 		}
 
 	}
-	db.DB.Exec("COMMIT TRANSACTION;")
+	tx.Commit()
 	return nil
 }
 
 // Deletes a batch of tasks, including their task_tag_links entries
 func TaskDeleteBatch(task_ids []uint64) error {
+	tx, err := db.DB.Beginx()
+	if err != nil {
+		return err
+	}
 	for _, task_id := range task_ids {
-		_, err1 := db.DB.Exec("DELETE FROM task_tag_links WHERE task_id = ?;", task_id)
+		_, err1 := tx.Exec("DELETE FROM task_tag_links WHERE task_id = ?;", task_id)
 		if err1 != nil {
+			tx.Rollback()
 			return &LogicError{Kind: "database", Msg: "Unable to delete task with task_id " + fmt.Sprintf("%d", task_id)}
 		}
-		_, err := db.DB.Exec("DELETE FROM tasks WHERE task_id = ?;", task_id)
+		_, err := tx.Exec("DELETE FROM tasks WHERE task_id = ?;", task_id)
 		if err != nil {
+			tx.Rollback()
 			return &LogicError{Kind: "database", Msg: "Unable to delete task with task_id " + fmt.Sprintf("%d", task_id)}
 		}
 	}
+	tx.Commit()
 	return nil
 }
 
