@@ -1,9 +1,9 @@
 // taskToggleCompleted contacts the API to update completion status
 function taskToggleCompleted(checkbox) {
-    let task_id = parseInt(checkbox.id.match(/[0-9]+/g));
+    let taskId = parseInt(checkbox.id.match(/[0-9]+/g));
     let update_args = JSON.stringify({
         completed: checkbox.checked,
-        task_id: task_id,
+        task_id: taskId,
         deadline: null,
         tag_ids: []
     });
