@@ -7,8 +7,8 @@ function taskToggleCompleted(checkbox) {
         deadline: null,
         tag_ids: []
     });
-    console.log("Updating task completed status.")
-    console.log(update_args)
+    //console.log("Updating task completed status.")
+    //console.log(update_args)
 
     let url = "http:\/\/" + self.location.host + "/api/v1/task/update"
     fetch(url, {
@@ -19,24 +19,20 @@ function taskToggleCompleted(checkbox) {
         }
     })
 }
-
 // taskDelete conducts an API req to delete that task, and removes it form the DOM
-// TODO: Change so that it takes in the element itself, not just the id
-// although maybe keep it this way, I dont know.
-function taskDelete(domIdOfElemOfEntireTask) {
-    let dom_id = domIdOfElemOfEntireTask
-    let task_id = parseInt(dom_id.match(/[0-9]+/g));
-    // Task element
-    const e = document.getElementById(dom_id)
+function taskDelete(deleteButtonElem) {
+    let e = deleteButtonElem
+    let task_id = parseInt(e.id.match(/[0-9]+/g));
+    //console.log(e)
 
     let delete_args = JSON.stringify({
         task_ids: [task_id]
     });
-    console.log("Deleting task.");
-    console.log(delete_args);
+    //console.log("Deleting task.");
+    //console.log(delete_args);
 
     let url = "http:\/\/" + self.location.host + "/api/v1/task/delete";
-    console.log(url);
+    //console.log(url);
     let response = Promise.resolve(fetch(url, {
         method: "POST",
         body: delete_args,
@@ -44,8 +40,8 @@ function taskDelete(domIdOfElemOfEntireTask) {
             "Content-type": "application/json; charset=UTF-8"
         }
     }));
-    console.log(response);
+    //console.log(response);
 
-    // Remove element, lets hope this is like correct and shit
-    document.getElementById(dom_id).outerHTML = "";
+    // Remove entire task element
+    e.parentNode.parentNode.outerHTML = "";
 }
