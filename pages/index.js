@@ -21,6 +21,8 @@ function taskToggleCompleted(checkbox) {
 }
 
 // taskDelete conducts an API req to delete that task, and removes it form the DOM
+// TODO: Change so that it takes in the element itself, not just the id
+// although maybe keep it this way, I dont know.
 function taskDelete(domIdOfElemOfEntireTask) {
     let dom_id = domIdOfElemOfEntireTask
     let task_id = parseInt(dom_id.match(/[0-9]+/g));
@@ -45,5 +47,5 @@ function taskDelete(domIdOfElemOfEntireTask) {
     console.log(response);
 
     // Remove element, lets hope this is like correct and shit
-    dom_id.remove();
+    document.getElementById(dom_id).outerHTML = "";
 }
