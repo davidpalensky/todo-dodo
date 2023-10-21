@@ -2,7 +2,6 @@ package logic
 
 import (
 	"fmt"
-	"log"
 	"todo-dodo/db"
 )
 
@@ -178,7 +177,7 @@ func TaskUpdate(a TaskUpdatArgs) error {
 		}
 		_, err := tx.Exec("UPDATE tasks SET completed = ? WHERE task_id = ?;", completed, a.Task_id)
 		if err != nil {
-			log.Printf("Err: %s", err.Error())
+			//log.Printf("Err: %s", err.Error())
 			tx.Rollback()
 			return err
 		}

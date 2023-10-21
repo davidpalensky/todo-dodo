@@ -1,7 +1,6 @@
 package api
 
 import (
-	"log"
 	"net/http"
 	"todo-dodo/logic"
 
@@ -70,7 +69,7 @@ func TaskUpdateEndpoint(ctx *gin.Context) {
 	if err := ctx.Bind(args); err != nil {
 		ctx.JSON(http.StatusBadRequest,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to update task: Invalid JSON, or incorrect fields provided."})
-		log.Printf("Error: %s", err.Error())
+		//log.Printf("Error: %s", err.Error())
 		return
 	}
 	//log.Printf("TaskUpdateEndpoint: Args = %+v\n", args)
@@ -78,7 +77,7 @@ func TaskUpdateEndpoint(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to create update: Failed to access database."})
-		log.Printf("Error: %s", err.Error())
+		//log.Printf("Error: %s", err.Error())
 		return
 	}
 	ctx.JSON(http.StatusOK, APIResponse{Success: true, Data: nil, ErrMsg: ""})
