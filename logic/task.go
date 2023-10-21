@@ -44,7 +44,7 @@ func TaskCreateBatch(args []TaskCreateArgs) error {
 
 		// Do tag stuff
 		task_id_uint64 := uint64(task_id)
-		err3 := TagCreateBatch(row.Tags, &task_id_uint64)
+		err3 := TagCreateBatch(row.Tags, task_id_uint64)
 		if err3 != nil {
 			tx.Rollback()
 			return err3
@@ -94,7 +94,7 @@ type TaskModel struct {
 }
 
 // Fetches all tasks from db
-// TODO: Make user specific and add auth
+// TODO: Add auth
 func TaskFetchAllDB(args *TaskFetchArgs) ([]TaskModel, error) {
 	var result []TaskModel
 	err := db.DB.Select(&result, "SELECT * FROM tasks WHERE user_id = ?;", args.User_id)

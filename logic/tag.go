@@ -7,34 +7,14 @@ import (
 	"todo-dodo/util"
 )
 
-// Inserts a bunch of tags into the database, inserts into task_tag_links aswell, if task_id_link is not nil
-func TagCreateBatch(tags []TagCreator, task_id_link *uint64) error {
-	if task_id_link != nil {
-		return tagCreateBatchLinked(tags, *task_id_link)
-	}
-	tx, err := db.DB.Beginx()
-	if err != nil {
-		return err
-	}
-	for _, tag := range tags {
-		_, err := tx.Exec("INSERT INTO tags (user_id, title, color) VALUES (?, ?, ?) ON CONFLICT (user_id, title, color) DO NOTHING;", tag.User_id, tag.Title, tag.Color)
-		if err != nil {
-			//db.DB.Exec("ROLLBACK;")
-			//log.Printf("Error: Could not insert data into db: %s", err)
-			tx.Rollback()
-			return &LogicError{Kind: "database", Msg: "TaskCreate: Could not enter tags into db: " + err.Error()}
-		}
-	}
-	tx.Commit()
-	return nil
-}
-
+// Inserts a bunch of tags into the database, inserts into task_tag_links aswell,
 // Yes this function is very messy and does too many queries, i am not a sqlite magician however.
-func tagCreateBatchLinked(tags []TagCreator, task_id uint64) error {
+func TagCreateBatch(tags []TagCreator, task_id uint64) error {
 	tx, err := db.DB.Beginx()
 	if err != nil {
 		return err
 	}
+
 	for _, tag := range tags {
 		// Verify color
 		if !util.ValidateHexcode(tag.Color) {
@@ -76,6 +56,7 @@ func tagCreateBatchLinked(tags []TagCreator, task_id uint64) error {
 			}
 		}
 	}
+
 	tx.Commit()
 	return nil
 }
