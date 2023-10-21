@@ -48,7 +48,8 @@
         <td>
           <button type="button"
             id="task-{{ .Task_id }}-delete-button"
-            name="task-{{ .Task_id }}-delete-button">
+            name="task-{{ .Task_id }}-delete-button"
+            onclick="taskDelete("task-{{ .Task_id }}")">
             &#x2715; <!-- 'X' but better -->
           </button>
         </td>
