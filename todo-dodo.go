@@ -17,6 +17,10 @@ func main() {
 	// Setup router
 	engine := gin.Default()
 
+	// Middleware
+	engine.Use(gin.Logger())
+	engine.Use(gin.Recovery())
+
 	// JSON-based APIs
 	engine.POST("/api/v1/task/create", api.TaskCreateBatchEnpoint)
 	engine.POST("/api/v1/task/fetch", api.TaskFetchAllEnpoint)
