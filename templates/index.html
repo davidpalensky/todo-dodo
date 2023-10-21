@@ -3,55 +3,63 @@
   <head>
     <title>Go To-Do list</title>
     <!-- Vanilla JS for the win. -->
-    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="/js/index.js"></script>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/index.css">
   </head>
 
   <body>
     <h1>
       Todo-dodo
     </h1>
-    <p>
-      A todo app that will hopefully soon exists.
-      Its lifetime depends on the generousity of AWS Free Tier.
 
-      Some serious <a href="test.html">testing</a> going on out here.
-    </p>
-    <h3>
-      Tasks
-    </h3>
-    <table id="tasks">
-      <tr>
-        <th></th>
-        <th>Title</th>
-        <th>Deadline</th>
-        <th></th>
-      </tr>
-      {{ range .Tasks}}
-      <tr id="task-{{ .Task_id}}" name="task-{{ .Task_id}}">
-        <td>
-          <input id="task-{{ .Task_id }}-completed"
-            type="checkbox"
-            name="task-{{ .Task_id }}-completed"
-            onchange="taskToggleCompleted(this)"
-            {{ if .Completed }} checked {{ end }}>
-        </td>
-      <td id="task-{{ .Task_id }}-title">
-          {{ .Title }}
-        </td>
-        <td id="task-{{ .Task_id }}-deadline">
-          {{ .Deadline }}
-        </td>
-        <td>
-          <button type="button"
-            id="task-{{ .Task_id }}-delete-button"
-            name="task-{{ .Task_id }}-delete-button"
-            onclick="taskDelete(this)">
-            &#x2715; <!-- 'X' but better -->
-          </button>
-        </td>
-      </tr>
-      {{ end }}
-    </table>
+    <div class="flexbox-container" style="display:flex;">
+
+      <!-- Task Table -->
+      <div class="sidebar" style="flex:1;">
+        <table id="tasks">
+
+          <tr>
+            <th></th>
+            <th>Title</th>
+            <th>Deadline</th>
+            <th></th>
+          </tr>
+
+          {{ range .Tasks }}
+          <tr id="task-{{ .Task_id}}" name="task-{{ .Task_id}}">
+            <td>
+              <input id="task-{{ .Task_id }}-completed"
+                type="checkbox"
+                name="task-{{ .Task_id }}-completed"
+                onchange="taskToggleCompleted(this)"
+                {{ if .Completed }} checked {{ end }}>
+            </td>
+            <td id="task-{{ .Task_id }}-title">
+              <button class="openTask">{{ .Title }}</button>
+            </td>
+            <td id="task-{{ .Task_id }}-deadline">
+              {{ .Deadline }}
+            </td>
+            <td>
+              <button type="button"
+                id="task-{{ .Task_id }}-delete-button"
+                name="task-{{ .Task_id }}-delete-button"
+                onclick="taskDelete(this)">
+                &#x2715; <!-- 'X' but better -->
+              </button>
+            </td>
+          </tr>
+          {{ end }}
+
+        </table>
+      </div>
+
+      <!-- Task Detailed -->
+      <div class="main" style="flex:1;">
+        Test column 2
+      </div>
+    </div>
 
   </body>
 </html>

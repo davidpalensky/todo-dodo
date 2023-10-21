@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"todo-dodo/api"
 	"todo-dodo/db"
 	"todo-dodo/pages"
@@ -23,26 +22,33 @@ func main() {
 	engine.Use(gin.Recovery())
 	engine.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedPaths([]string{"/api/**"})))
 
-	// JSON-based APIs
-	api_g := engine.Group("/api/v1")
-	api_g.POST("/task/create", api.TaskCreateBatchEnpoint)
-	api_g.POST("/task/fetch", api.TaskFetchAllEnpoint)
-	api_g.POST("/task/delete", api.TaskDeleteBatchEnpoint)
-	api_g.POST("/task/update", api.TaskUpdateEndpoint)
+	{ // JSON-based APIs
+		api_g := engine.Group("/api/v1")
+		api_g.POST("/task/create", api.TaskCreateBatchEnpoint)
+		api_g.POST("/task/fetch", api.TaskFetchAllEnpoint)
+		api_g.POST("/task/delete", api.TaskDeleteBatchEnpoint)
+		api_g.POST("/task/update", api.TaskUpdateEndpoint)
 
-	api_g.POST("/tag/delete", api.TagDeleteBatchEnpoint)
-
-	// Load Templates
-	engine.LoadHTMLGlob("./templates/*")
-
-	// Make Templates avaliable
-	engine.GET("/", pages.Index)
-	if os.Getenv("TODO_DODO_DEV") == "1" {
-		engine.GET("/test.html", pages.Test)
+		api_g.POST("/tag/delete", api.TagDeleteBatchEnpoint)
 	}
 
-	// Js files
-	engine.StaticFile("index.js", "./pages/index.js")
+	// Templates
+	engine.LoadHTMLGlob("./templates/*")
+
+	{ // Js files
+		js_g := engine.Group("/js")
+		js_g.StaticFile("/index.js", "./pages/index.js")
+	}
+
+	{
+		css_g := engine.Group("/css")
+		css_g.StaticFile("/index.css", "./pages/index.css")
+	}
+
+	{ // Website
+		site_g := engine.Group("")
+		site_g.GET("/", pages.Index)
+	}
 
 	// Run server
 	engine.Run()

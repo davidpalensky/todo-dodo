@@ -1,4 +1,23 @@
+window.onload = init()
+
+function init() {
+    const taskTitles = document.getElementsByClassName('openTask');
+    console.log(taskTitles);
+    console.log("Hello, hello");
+    const taskTitles_as_arr = [...taskTitles];
+    console.log(taskTitles_as_arr);
+    console.log("Hello, hello");
+}
+
+// openTask opens a task in the side view of the page
+function openTask(event) {
+    console.log("openTask is not yet implemented");
+    console.log(event);
+}
+
+
 // taskToggleCompleted contacts the API to update completion status
+// TODO: Put this into init() not into html directly
 function taskToggleCompleted(checkbox) {
     let taskId = parseInt(checkbox.id.match(/[0-9]+/g));
     let update_args = JSON.stringify({
@@ -21,6 +40,7 @@ function taskToggleCompleted(checkbox) {
 }
 
 // taskDelete conducts an API req to delete that task, and removes it form the DOM
+// TODO: Put this into init() not into html directly
 function taskDelete(deleteButtonElem) {
     let e = deleteButtonElem;
     let taskId = parseInt(e.id.match(/[0-9]+/g));
@@ -48,6 +68,7 @@ function taskDelete(deleteButtonElem) {
 }
 
 // sortTasks sorts the task table.
-function sortTasks(sortBy, Asc) {
+//function sortTasks(sortBy, Asc) {
+//
+//}
 
-}
