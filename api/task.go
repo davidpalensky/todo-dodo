@@ -48,7 +48,7 @@ func TaskFetchAllEnpoint(ctx *gin.Context) {
 
 // Api endpoint for deleting tags by sending a list of ids [..., ..., ..., ...]
 func TaskDeleteBatchEnpoint(ctx *gin.Context) {
-	args := new([]uint64) // List of task ids
+	args := new(logic.TaskDeleteBatchArgs) // List of task ids
 	if err := ctx.Bind(args); err != nil {
 		ctx.JSON(http.StatusBadRequest,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to delete tasks: Invalid JSON, or incorrect fields provided."})

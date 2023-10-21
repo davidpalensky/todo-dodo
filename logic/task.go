@@ -55,13 +55,17 @@ func TaskCreateBatch(args []TaskCreateArgs) error {
 	return nil
 }
 
+type TaskDeleteBatchArgs struct {
+	Task_ids []uint64 `json:"task_ids"`
+}
+
 // Deletes a batch of tasks, including their task_tag_links entries
-func TaskDeleteBatch(task_ids []uint64) error {
+func TaskDeleteBatch(a TaskDeleteBatchArgs) error {
 	tx, err := db.DB.Beginx()
 	if err != nil {
 		return err
 	}
-	for _, task_id := range task_ids {
+	for _, task_id := range a.Task_ids {
 		_, err1 := tx.Exec("DELETE FROM task_tag_links WHERE task_id = ?;", task_id)
 		if err1 != nil {
 			tx.Rollback()
