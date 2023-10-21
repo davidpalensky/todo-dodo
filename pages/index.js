@@ -23,17 +23,18 @@ function taskToggleCompleted(checkbox) {
 // taskDelete conducts an API req to delete that task, and removes it form the DOM
 function taskDelete(domIdOfElemOfEntireTask) {
     let dom_id = domIdOfElemOfEntireTask
-    let task_id = parseInt(checkbox.id.match(/[0-9]+/g));
+    let task_id = parseInt(dom_id.match(/[0-9]+/g));
     // Task element
     const e = document.getElementById(dom_id)
 
     let delete_args = JSON.stringify({
-        taskids: [task_id]
+        task_ids: [task_id]
     });
     console.log("Deleting task.");
     console.log(delete_args);
 
     let url = "http:\/\/" + self.location.host + "/api/v1/task/delete";
+    console.log(url);
     let response = Promise.resolve(fetch(url, {
         method: "POST",
         body: delete_args,

@@ -66,7 +66,7 @@ func TaskDeleteBatchEnpoint(ctx *gin.Context) {
 
 // Enpoint for updating tasks
 func TaskUpdateEndpoint(ctx *gin.Context) {
-	args := new(logic.TaskUpdatArgs) // List of task ids
+	args := new(logic.TaskUpdatArgs)
 	if err := ctx.Bind(args); err != nil {
 		ctx.JSON(http.StatusBadRequest,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to update task: Invalid JSON, or incorrect fields provided."})
