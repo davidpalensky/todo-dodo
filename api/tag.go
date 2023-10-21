@@ -16,7 +16,7 @@ func TagDeleteBatchEnpoint(ctx *gin.Context) {
 		//log.Printf("Error: %s", err.Error())
 		return
 	}
-	err := logic.TaskDeleteBatch(*args)
+	err := logic.TagDeleteBatch(*args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to create fetch tasks: Failed to write to database."})
