@@ -1,4 +1,4 @@
-// This function is meant to be run when the completed checkbox next to a task is clicked.
+// taskToggleCompleted contacts the API to update completion status
 function taskToggleCompleted(checkbox) {
     let task_id = parseInt(checkbox.id.match(/[0-9]+/g));
     let update_args = JSON.stringify({
