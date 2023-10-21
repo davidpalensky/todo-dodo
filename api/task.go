@@ -9,14 +9,14 @@ import (
 
 // Api endpoint for creating a batch of tasks for a user
 func TaskCreateBatchEnpoint(ctx *gin.Context) {
-	args := new([]logic.TaskCreateArgs)
+	args := new(logic.TaskCreateArgs)
 	if err := ctx.Bind(args); err != nil {
 		//response, _ := json.Marshal(APIResponse{Success: false, Data: nil, Err_msg: "Unable to create tasks: Invalid JSON, or incorrect fields provided."})
 		ctx.JSON(http.StatusBadRequest,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to create tasks: Invalid JSON, or incorrect fields provided."})
 		return
 	}
-	if err := logic.TaskCreateBatch(*args); err != nil {
+	if err := logic.TaskCreate(*args); err != nil {
 		//log.Printf("err: %s", err.Error())
 		ctx.JSON(http.StatusInternalServerError,
 			APIResponse{Success: false, Data: nil, ErrMsg: "Unable to create tasks: Failed to modify database record."})

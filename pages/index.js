@@ -19,29 +19,35 @@ function taskToggleCompleted(checkbox) {
         }
     })
 }
+
 // taskDelete conducts an API req to delete that task, and removes it form the DOM
 function taskDelete(deleteButtonElem) {
     let e = deleteButtonElem
-    let task_id = parseInt(e.id.match(/[0-9]+/g));
+    let taskId = parseInt(e.id.match(/[0-9]+/g));
     //console.log(e)
 
     let delete_args = JSON.stringify({
-        task_ids: [task_id]
+        task_ids: [taskId]
     });
     //console.log("Deleting task.");
     //console.log(delete_args);
 
     let url = "http:\/\/" + self.location.host + "/api/v1/task/delete";
     //console.log(url);
-    let response = Promise.resolve(fetch(url, {
+    fetch(url, {
         method: "POST",
         body: delete_args,
         headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    }));
+    });
     //console.log(response);
 
     // Remove entire task element
     e.parentNode.parentNode.outerHTML = "";
+}
+
+// sortTasks sorts the task table.
+function sortTasks(sortBy, Asc) {
+
 }

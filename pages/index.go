@@ -3,6 +3,7 @@ package pages
 import (
 	"log"
 	"net/http"
+	"sort"
 	"time"
 	"todo-dodo/logic"
 
@@ -14,7 +15,6 @@ var _ = log.Printf
 
 type TaskView struct {
 	Title     string
-	Creation  string
 	Deadline  string
 	Completed bool
 	Task_id   uint64
@@ -28,6 +28,11 @@ func Index(ctx *gin.Context) {
 		//log.Println("Could not render html: ", err.Error())
 	}
 	//log.Println("data: ", data)
+
+	// Sort tasks by oldest due date first.
+	sort.Slice(data.Tasks[:], func(i int, j int) bool {
+		return data.Tasks[i].Task_data.Deadline < data.Tasks[j].Task_data.Deadline
+	})
 
 	var task_view []TaskView
 	for i := 0; i < len(data.Tasks); i++ {
