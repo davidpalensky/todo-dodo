@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Golang, what about #[allow(unused_imports)]? We've solved this problem already.
+// Golang, what about #[allow(unused_imports)]?
 var _ = log.Printf
 
 type TaskView struct {

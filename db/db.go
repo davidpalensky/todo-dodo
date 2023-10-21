@@ -21,7 +21,7 @@ func Open() {
 	path := "./db/todo-dodo.db"
 	db, err := sqlx.Open("sqlite3", path)
 	if err != nil {
-		log.Fatalf("Could not open url with path: %s\nerr: %s\n", path, err.Error())
+		log.Fatalf("Could not open db with path: %s\nerr: %s\n", path, err.Error())
 		os.Exit(1)
 	}
 	DB = db
