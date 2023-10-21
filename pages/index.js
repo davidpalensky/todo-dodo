@@ -10,19 +10,19 @@ function taskToggleCompleted(checkbox) {
     //console.log("Updating task completed status.")
     //console.log(update_args)
 
-    let url = "http:\/\/" + self.location.host + "/api/v1/task/update"
+    let url = "http:\/\/" + self.location.host + "/api/v1/task/update";
     fetch(url, {
         method: "POST",
         body: update_args,
         headers: {
             "Content-type": "application/json; charset=UTF-8"
         }
-    })
+    });
 }
 
 // taskDelete conducts an API req to delete that task, and removes it form the DOM
 function taskDelete(deleteButtonElem) {
-    let e = deleteButtonElem
+    let e = deleteButtonElem;
     let taskId = parseInt(e.id.match(/[0-9]+/g));
     //console.log(e)
 
