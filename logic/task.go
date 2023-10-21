@@ -192,13 +192,13 @@ func TaskUpdate(a TaskUpdatArgs) error {
 	}
 	if len(a.Tag_ids) != 0 {
 		type TaskTagLinksInserts struct {
-			TaskId uint64
-			TagId  uint64
+			Task_id uint64
+			Tag_id  uint64
 		}
 
 		var inserts []TaskTagLinksInserts
 		for _, tag_id := range a.Tag_ids {
-			inserts = append(inserts, TaskTagLinksInserts{TaskId: a.Task_id, TagId: tag_id})
+			inserts = append(inserts, TaskTagLinksInserts{Task_id: a.Task_id, Tag_id: tag_id})
 		}
 
 		_, err = tx.NamedExec("INSERT INTO task_tag_links (task_id, tag_id) VALUES (:task_id, :tag_id)", inserts)
