@@ -1,2 +1,2 @@
 *.env
-db/todo-dodo.db
+./db/todo-dodo.db
