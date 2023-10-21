@@ -6,6 +6,7 @@ import (
 	"todo-dodo/db"
 	"todo-dodo/pages"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +21,7 @@ func main() {
 	// Middleware
 	engine.Use(gin.Logger())
 	engine.Use(gin.Recovery())
+	engine.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedPaths([]string{"/api/**"})))
 
 	// JSON-based APIs
 	api_g := engine.Group("/api/v1")
