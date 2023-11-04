@@ -1,4 +1,16 @@
+/* Currently broken, meant for clicking on the task titles
+   to make the task view change. */
 button.openTask {
     background: none;
     border: none;
+}
+
+/* Used for: list of tags in sidebar */
+taglist {
+    /* Remove bullets */
+    list-style-type: none;
+    /* Remove padding */
+    padding: 0;
+    /* Remove margins */
+    margin: 0;
 }

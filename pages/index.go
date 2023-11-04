@@ -53,5 +53,6 @@ func Index(ctx *gin.Context) {
 
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"Tasks": tasks,
+		"Tags":  data.Tags,
 	})
 }

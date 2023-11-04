@@ -1,20 +1,14 @@
-window.onload = init()
-
-function init() {
-    const taskTitles = document.getElementsByClassName('openTask');
-    console.log(taskTitles);
-    console.log("Hello, hello");
-    const taskTitles_as_arr = [...taskTitles];
-    console.log(taskTitles_as_arr);
-    console.log("Hello, hello");
+// xid reads the dom element id of domElement, and returns the first match
+// of subsequent numeric characters.
+// 
+// Example:
+// if domElement.id = "task-6789-completion" then
+// xid(domElement) --> 6789
+//
+// May throw.
+function xid(domElement) {
+    return parseInt(domElement.id.match(/[0-9]+/g));
 }
-
-// openTask opens a task in the side view of the page
-function openTask(event) {
-    console.log("openTask is not yet implemented");
-    console.log(event);
-}
-
 
 // taskToggleCompleted contacts the API to update completion status
 // TODO: Put this into init() not into html directly
@@ -65,6 +59,16 @@ function taskDelete(deleteButtonElem) {
 
     // Remove entire task element
     e.parentNode.parentNode.outerHTML = "";
+}
+
+// taskFilter should be called when the user selects a filter option.
+// It will directly manipulate the dom, and uses the 
+function taskFilter(filterButtonElem) {
+    let e = filterButtonElem;
+    console.log("Hello from taskFilter");
+    console.log("Tag dom id: " + e.id);
+    console.log("checkbox.checked: " + e.checked);
+    console.log("\n");
 }
 
 // sortTasks sorts the task table.

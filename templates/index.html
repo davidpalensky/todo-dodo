@@ -14,9 +14,25 @@
     </h1>
 
     <div class="flexbox-container" style="display:flex;">
+      <!-- Task Filters -->
+      <div class="sidebar taglist" style="flex:1;">
+        <ul class="taglist">
+        {{ range .Tags }}
+        <li>
+          <input id="tag-{{ .Tag_id }}-selection"
+            type="checkbox"
+            name="tag-{{ .Tag_id }}-selection"
+            onchange="taskFilter(this)"
+            checked>
+            {{ .Title }}
+          </input>
+        </li>
+        {{ end }}
+        </ul>
+      </div>
 
       <!-- Task Table -->
-      <div class="sidebar" style="flex:1;">
+      <div class="main" style="flex:1;">
         <table id="tasks">
 
           <tr>
@@ -34,12 +50,13 @@
                 name="task-{{ .Task_id }}-completed"
                 onchange="taskToggleCompleted(this)"
                 {{ if .Completed }} checked {{ end }}>
+              </input>
             </td>
             <td id="task-{{ .Task_id }}-title">
               <button class="openTask">{{ .Title }}</button>
             </td>
             <td id="task-{{ .Task_id }}-deadline">
-              {{ .Deadline }}
+              {{ .Deadline_fmt }}
             </td>
             <td>
               <button type="button"
@@ -55,9 +72,9 @@
         </table>
       </div>
 
-      <!-- Task Detailed -->
-      <div class="main" style="flex:1;">
-        Test column 2
+      <!-- Task Details -->
+      <div class="sidebar" style="flex:1;">
+        Test column 3
       </div>
     </div>
 
