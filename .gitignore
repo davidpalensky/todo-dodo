@@ -1,4 +1,9 @@
 *.env
+
 *.db
-/db/*.db
+**/*.db
 ./db/todo-dodo.db
+
+**/node_modules/
+**/public/build/
+**/.DS_Store
